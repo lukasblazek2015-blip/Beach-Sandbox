@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sunny Shore — a tiny beach adventure</title>
+  <title>Beach Sandbox — Version 1.0</title>
   <style>
     :root {
       color-scheme: light;
@@ -104,6 +104,187 @@
       cursor: pointer;
     }
     .info-button:hover { background: white; }
+
+    .camera-toggle {
+      position: fixed;
+      z-index: 3;
+      top: 16px;
+      right: 16px;
+      padding: 12px 15px;
+      border: 1px solid rgba(255, 255, 255, .82);
+      border-radius: 13px;
+      background: var(--glass);
+      color: #31596a;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 5px 16px rgba(29, 90, 103, .12);
+      backdrop-filter: blur(14px);
+      cursor: pointer;
+    }
+    .camera-toggle:hover { background: white; }
+    .camera-toggle[aria-pressed="true"] { background: #e5f4dd; }
+
+    .main-menu {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(15, 54, 68, .38);
+      backdrop-filter: blur(7px);
+    }
+    .main-menu[hidden] { display: none; }
+    .menu-card {
+      width: min(420px, 100%);
+      padding: 32px;
+      border: 1px solid rgba(255, 255, 255, .86);
+      border-radius: 26px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: 0 24px 80px rgba(17, 55, 68, .28);
+      text-align: center;
+    }
+    .menu-mark { margin-bottom: 8px; font-size: 40px; }
+    .menu-title { margin: 0; color: #143747; font-size: 34px; font-weight: 900; letter-spacing: -.05em; }
+    .menu-subtitle { margin: 8px 0 24px; color: #5c7781; font-size: 14px; font-weight: 650; }
+    .menu-actions { display: grid; gap: 10px; }
+    .save-slot-picker {
+      display: grid;
+      gap: 7px;
+      margin: 0 0 12px;
+      color: #456b79;
+      font-size: 12px;
+      font-weight: 850;
+      text-align: left;
+    }
+    .save-slot-picker select {
+      width: 100%;
+      min-height: 44px;
+      padding: 9px 11px;
+      border: 1px solid #d5e5e5;
+      border-radius: 11px;
+      background: white;
+      color: #31596a;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .save-slot-details { min-height: 18px; margin: -4px 0 14px; color: #65818a; font-size: 12px; font-weight: 700; text-align: left; }
+    .menu-action {
+      min-height: 48px;
+      padding: 12px 16px;
+      border: 1px solid #d5e5e5;
+      border-radius: 13px;
+      background: #fff;
+      color: #31596a;
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .menu-action:hover:not(:disabled) { background: #f0f8f6; }
+    .menu-action.primary { border-color: #3c8992; background: #3e929c; color: white; }
+    .menu-action.primary:hover { background: #347e88; }
+    .menu-action:disabled { opacity: .48; cursor: default; }
+    .menu-status { min-height: 20px; margin: 16px 0 0; color: #5c7781; font-size: 13px; font-weight: 700; }
+
+    .craft-toggle, .trowel-toggle {
+      position: fixed;
+      z-index: 3;
+      top: 16px;
+      padding: 11px 14px;
+      border: 1px solid rgba(255, 255, 255, .82);
+      border-radius: 13px;
+      background: var(--glass);
+      color: #31596a;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 5px 16px rgba(29, 90, 103, .12);
+      backdrop-filter: blur(14px);
+      cursor: pointer;
+    }
+    .craft-toggle { right: 16px; top: 68px; }
+    .trowel-toggle { right: 190px; }
+    .trowel-toggle[aria-pressed="true"], .craft-toggle[aria-expanded="true"] { background: #e5f4dd; }
+    .crafting-panel {
+      position: fixed;
+      z-index: 4;
+      top: 126px;
+      right: 16px;
+      width: min(390px, calc(100vw - 32px));
+      max-height: min(70vh, 650px);
+      overflow: auto;
+      padding: 17px;
+      border: 1px solid rgba(255, 255, 255, .85);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .95);
+      box-shadow: 0 12px 36px rgba(29, 90, 103, .18);
+      color: #295364;
+      backdrop-filter: blur(14px);
+    }
+    .crafting-panel[hidden] { display: none; }
+    .crafting-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .crafting-title { margin: 0; color: #143747; font-size: 18px; font-weight: 900; }
+    .crafting-close { border: 0; background: transparent; color: #456b79; font: inherit; font-size: 21px; cursor: pointer; }
+    .crafting-stock { margin: 10px 0; color: #456b79; font-size: 13px; font-weight: 750; line-height: 1.6; }
+    .crafting-status { min-height: 18px; margin: 0 0 10px; color: #3e7d83; font-size: 12px; font-weight: 750; }
+    .placement-hint {
+      position: fixed;
+      z-index: 5;
+      top: 50%;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: calc(100vw - 28px);
+      padding: 11px 14px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255, 255, 255, .9);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .94);
+      color: #295364;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 26px rgba(29, 90, 103, .2);
+      backdrop-filter: blur(12px);
+      pointer-events: none;
+    }
+    .placement-hint[hidden] { display: none; }
+    .placement-cancel {
+      padding: 6px 9px;
+      border: 1px solid #d5e5e5;
+      border-radius: 8px;
+      background: white;
+      color: #31596a;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+    .crafting-section-title { margin: 14px 0 7px; color: #143747; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }
+    .crafting-list { display: grid; gap: 7px; }
+    .craft-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 11px;
+      border: 1px solid #d5e5e5;
+      border-radius: 11px;
+      background: white;
+      color: #31596a;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    .craft-option:hover:not(:disabled) { background: #f0f8f6; }
+    .craft-option:disabled { opacity: .48; cursor: default; }
+    .craft-option-name { font-size: 13px; font-weight: 850; }
+    .craft-option-cost { margin-top: 3px; color: #65818a; font-size: 11px; font-weight: 650; }
+    .craft-option-action { flex: 0 0 auto; font-size: 12px; font-weight: 850; }
+    .sand-inventory { margin-top: 8px; color: #65818a; font-size: 12px; font-weight: 700; }
 
     .hint-title {
       margin: 0 0 9px;
@@ -321,6 +502,86 @@
     }
     .pickup-button[hidden] { display: none; }
 
+    .portal-button {
+      position: fixed;
+      z-index: 3;
+      left: 50%;
+      bottom: 96px;
+      padding: 14px 20px;
+      border: 1px solid rgba(255, 255, 255, .9);
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f8f2ff, #dceeff);
+      color: #31596a;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 850;
+      box-shadow: 0 6px 24px rgba(48, 77, 132, .28);
+      transform: translateX(-50%);
+      cursor: pointer;
+    }
+    .portal-button[hidden] { display: none; }
+    body.castle-mode .portal-button { bottom: 136px; }
+
+    .castle-hud {
+      position: fixed;
+      z-index: 2;
+      top: 22px;
+      left: 50%;
+      padding: 12px 18px;
+      border: 1px solid rgba(255, 255, 255, .82);
+      border-radius: 14px;
+      background: rgba(32, 46, 59, .82);
+      color: white;
+      font-size: 14px;
+      font-weight: 850;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(19, 38, 49, .18);
+      backdrop-filter: blur(12px);
+      transform: translateX(-50%);
+    }
+    .castle-hud[hidden] { display: none; }
+
+    .tool-panel {
+      position: fixed;
+      z-index: 3;
+      bottom: 26px;
+      left: 50%;
+      display: none;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 17px;
+      background: rgba(255, 255, 255, .78);
+      box-shadow: 0 7px 24px rgba(29, 65, 81, .2);
+      backdrop-filter: blur(14px);
+      transform: translateX(-50%);
+    }
+    body.castle-mode .tool-panel { display: flex; }
+    body.castle-mode .inspect-button,
+    body.castle-mode .dive-button,
+    body.castle-mode .sprint-button,
+    body.castle-mode .pickup-button { display: none !important; }
+    body.castle-mode .inventory { display: none; }
+    body.castle-mode .reset { left: 32px; z-index: 4; }
+    .tool-button {
+      min-width: 88px;
+      padding: 10px 12px;
+      border: 1px solid rgba(176, 199, 205, .78);
+      border-radius: 11px;
+      background: rgba(255, 255, 255, .78);
+      color: #31596a;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .tool-button[aria-pressed="true"] {
+      border-color: #e3a65c;
+      background: #fff0cf;
+      box-shadow: inset 0 0 0 1px #e3a65c;
+    }
+    .tool-button kbd { margin-right: 4px; }
+
     #underwater-overlay {
       position: fixed;
       z-index: 1;
@@ -369,7 +630,7 @@
       .subtitle { font-size: 15px; }
       .info-button { top: 96px; left: 32px; right: auto; }
       .hint { top: 148px; left: 32px; right: auto; }
-      .inventory { top: 82px; right: 32px; }
+      .inventory { top: 126px; right: 32px; }
       .inspect-button { left: 32px; bottom: 30px; }
       .reset { left: 225px; bottom: 30px; }
       .dive-button { right: 32px; bottom: 30px; }
@@ -381,7 +642,7 @@
     }
 
     @media (min-width: 541px) and (max-width: 899px) {
-      .info-button { top: 24px; right: 16px; }
+      .info-button { top: 24px; left: 16px; right: auto; }
       .hint {
         top: 88px;
         left: 16px;
@@ -393,7 +654,7 @@
       .control-item { gap: 6px; font-size: 12px; }
       .control-key { min-width: 24px; }
       .inventory {
-        top: 88px;
+        top: 126px;
         right: 16px;
         left: auto;
         width: min(280px, calc(44vw - 20px));
@@ -425,7 +686,12 @@
       .control-item { gap: 7px; font-size: 12px; }
       .control-item kbd, .control-key { min-width: 27px; height: 23px; padding: 0 5px; font-size: 11px; }
       .hint-sub { margin-top: 9px; padding-top: 8px; font-size: 11px; }
+      .camera-toggle { top: 16px; right: 12px; padding: 10px 11px; font-size: 12px; }
+      .trowel-toggle { top: 72px; right: 12px; padding: 10px 11px; font-size: 12px; }
+      .craft-toggle { top: 126px; right: 12px; padding: 10px 11px; font-size: 12px; }
+      .crafting-panel { top: 174px; right: 12px; }
       .reset { bottom: 132px; left: 16px; }
+      body.castle-mode .reset { bottom: 16px; left: 16px; }
       .inspect-button { bottom: 190px; left: 16px; }
       .controls {
         right: 16px;
@@ -437,7 +703,7 @@
       .sprint-button { right: auto; left: 16px; bottom: 250px; }
       .dive-button { right: 16px; bottom: 145px; }
       .inventory {
-        top: 76px;
+        top: 182px;
         right: 12px;
         left: auto;
         width: min(180px, calc(48vw - 12px));
@@ -451,6 +717,11 @@
       .inventory-chip { padding: 5px 7px; font-size: 11px; }
       .inventory-empty { font-size: 11px; }
       .pickup-button { bottom: 130px; max-width: calc(100vw - 32px); }
+      .castle-hud { top: 130px; max-width: calc(100vw - 24px); padding: 10px 12px; font-size: 12px; }
+      .tool-panel { bottom: 142px; width: calc(100vw - 24px); justify-content: center; gap: 5px; padding: 6px; }
+      .tool-button { min-width: 0; flex: 1; padding: 9px 5px; font-size: 10px; }
+      .tool-button kbd { min-width: 20px; height: 20px; margin-right: 2px; padding: 0 4px; font-size: 10px; }
+      .portal-button { bottom: 185px; max-width: calc(100vw - 32px); white-space: nowrap; }
     }
   </style>
 </head>
@@ -459,24 +730,69 @@
   <header class="topbar">
     <div class="sun-mark" aria-hidden="true">☀️</div>
     <div>
-      <h1 class="title">Sunny Shore</h1>
-      <p class="subtitle">Explore the shore · Find beach treasures</p>
+      <h1 class="title">Beach Sandbox</h1>
+      <p class="subtitle">Explore · Enter the portal · Demolish the giant sandcastle</p>
     </div>
   </header>
   <button class="info-button" id="information" type="button" aria-controls="game-controls" aria-expanded="false">Information</button>
+  <button class="camera-toggle" id="camera-toggle" type="button" aria-pressed="false" aria-label="Switch to first-person view">V &nbsp; First-person</button>
+  <button class="trowel-toggle" id="trowel-toggle" type="button" aria-pressed="false">🪏 &nbsp; Trowel</button>
+  <button class="craft-toggle" id="craft-toggle" type="button" aria-expanded="false" aria-controls="crafting-panel">C &nbsp; Craft</button>
+  <div class="placement-hint" id="placement-hint" role="status" aria-live="polite" hidden>
+    <span id="placement-hint-text"></span>
+    <button class="placement-cancel" id="placement-cancel" type="button">Cancel</button>
+  </div>
+  <section class="crafting-panel" id="crafting-panel" aria-label="Sandcastle crafting" hidden>
+    <div class="crafting-heading">
+      <h2 class="crafting-title">Craft sandcastles</h2>
+      <button class="crafting-close" id="crafting-close" type="button" aria-label="Close crafting">×</button>
+    </div>
+    <p class="crafting-stock" id="crafting-stock"></p>
+    <p class="crafting-status" id="crafting-status" role="status" aria-live="polite"></p>
+    <h3 class="crafting-section-title">Recipes</h3>
+    <div class="crafting-list" id="crafting-recipes"></div>
+    <h3 class="crafting-section-title">Your castles · click one to place</h3>
+    <div class="crafting-list" id="crafted-inventory"></div>
+    <p class="sand-inventory" id="crafted-empty">No castles yet. Craft one from sand and beach finds.</p>
+  </section>
+  <section class="main-menu" id="main-menu" role="dialog" aria-modal="true" aria-label="Main menu">
+    <div class="menu-card">
+      <div class="menu-mark" aria-hidden="true">☀️</div>
+      <h2 class="menu-title">Beach Sandbox</h2>
+      <p class="menu-subtitle">Version 1.0</p>
+      <label class="save-slot-picker" for="save-slot">
+        Save slot
+        <select id="save-slot" aria-label="Choose save slot"></select>
+      </label>
+      <p class="save-slot-details" id="save-slot-details" aria-live="polite"></p>
+      <div class="menu-actions">
+        <button class="menu-action primary" id="new-game" type="button">New Game</button>
+        <button class="menu-action" id="load-game" type="button">Load Game</button>
+        <button class="menu-action" id="save-game" type="button">Save Game</button>
+        <button class="menu-action" id="resume-game" type="button" hidden>Return to Game</button>
+      </div>
+      <p class="menu-status" id="menu-status" role="status" aria-live="polite"></p>
+    </div>
+  </section>
   <aside class="hint" id="game-controls" aria-label="Game controls" hidden>
     <h2 class="hint-title">Controls</h2>
     <div class="control-list">
-      <div class="control-item"><kbd>W / ↑</kbd><span>Walk forward</span></div>
-      <div class="control-item"><kbd>A/D · ↶↷</kbd><span>Turn</span></div>
-      <div class="control-item"><kbd>S / ↓</kbd><span>Slow reverse</span></div>
+      <div class="control-item"><kbd>W / S</kbd><span>Walk / reverse</span></div>
+      <div class="control-item"><kbd>A / D</kbd><span>Turn</span></div>
+      <div class="control-item"><kbd>← ↑ ↓ →</kbd><span>Look around</span></div>
       <div class="control-item"><kbd>Shift</kbd><span>Sprint</span></div>
       <div class="control-item"><kbd>I</kbd><span>Inspect sand</span></div>
       <div class="control-item"><kbd>E</kbd><span>Pick up find</span></div>
       <div class="control-item"><kbd>U</kbd><span>Dive / surface</span></div>
+      <div class="control-item"><kbd>F</kbd><span>Use nearby portal</span></div>
+      <div class="control-item"><kbd>V</kbd><span>Switch camera view</span></div>
+      <div class="control-item"><kbd>1–4</kbd><span>Choose a tool</span></div>
+      <div class="control-item"><kbd>Trowel</kbd><span>Collect dry / wet sand</span></div>
+      <div class="control-item"><kbd>C</kbd><span>Craft and place castles</span></div>
+      <div class="control-item"><kbd>Esc</kbd><span>Open the menu / save</span></div>
       <div class="control-item"><span class="control-key">↺</span><span>Reset beach</span></div>
     </div>
-    <span class="hint-sub">Find small shells, glass and starfish on the sand.</span>
+    <span class="hint-sub">Click inside the gate to pour sand. Use the trowel to scoop dry or wet sand, then press C to craft and place castles. In the giant castle, select a tool to demolish bricks.</span>
   </aside>
   <div id="underwater-overlay" aria-hidden="true"></div>
   <aside class="inventory" aria-label="Beach finds inventory">
@@ -488,6 +804,14 @@
   </aside>
   <button class="inspect-button" id="inspect" type="button" aria-label="Inspect the sand" aria-pressed="false" disabled><kbd>I</kbd> &nbsp; Inspect sand</button>
   <button class="pickup-button" id="pickup" type="button" aria-label="Pick up nearby find" hidden></button>
+  <button class="portal-button" id="portal" type="button" hidden>F &nbsp; Enter the sandcastle portal</button>
+  <div class="castle-hud" id="castle-hud" hidden>CASTLE BRICKS · <span id="castle-bricks-left">0</span> standing</div>
+  <div class="tool-panel" id="tool-panel" aria-label="Sandcastle demolition tools">
+    <button class="tool-button" type="button" data-tool="bomb" aria-pressed="true"><kbd>1</kbd>Bomb gun</button>
+    <button class="tool-button" type="button" data-tool="blaster" aria-pressed="false"><kbd>2</kbd>Sand blaster</button>
+    <button class="tool-button" type="button" data-tool="water" aria-pressed="false"><kbd>3</kbd>Water cannon</button>
+    <button class="tool-button" type="button" data-tool="mallet" aria-pressed="false"><kbd>4</kbd>Giant mallet</button>
+  </div>
   <button class="dive-button" id="dive" type="button" aria-label="Dive underwater" disabled><kbd>U</kbd> &nbsp; Dive</button>
   <button class="sprint-button" id="sprint" type="button" aria-label="Hold to sprint" aria-pressed="false">RUN</button>
   <button class="reset" id="reset" type="button" aria-label="Reset to the starting beach">↺ &nbsp;Reset beach</button>
@@ -517,6 +841,9 @@
       const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 280);
       const cameraFollowDistance = 13.5;
       const cameraFollowHeight = 8.5;
+      let firstPersonCamera = false;
+      let cameraOrbitYaw = 0;
+      let cameraOrbitPitch = 0;
 
       scene.add(new THREE.HemisphereLight("#e7fbff", "#d0a66d", 2.15));
       const sunLight = new THREE.DirectionalLight("#fff1c8", 3.1);
@@ -589,7 +916,15 @@
           );
       };
       const shoreZ = (x) => 1.4 + Math.sin(x * 0.14) * 0.42 + Math.sin(x * 0.33) * 0.16;
-      const terrainHeight = (x, z) => {
+      const fencedArea = { minX: -10, maxX: 10, frontZ: 8, backZ: 22 };
+      const overlapsFencedArea = (x, z, radiusX, radiusZ = radiusX) =>
+        x + radiusX >= fencedArea.minX && x - radiusX <= fencedArea.maxX &&
+        z + radiusZ >= fencedArea.frontZ && z - radiusZ <= fencedArea.backZ;
+      const naturalTerrainHeight = (x, z) => {
+        if (
+          x >= fencedArea.minX - 1 && x <= fencedArea.maxX + 1 &&
+          z >= fencedArea.frontZ - 1 && z <= fencedArea.backZ + 1
+        ) return 0.025;
         const dunes = THREE.MathUtils.smoothstep(z, 5, 13);
         const duneHills =
           2.6 * Math.exp(-(((x + 7) / 5) ** 2 + ((z - 9) / 5) ** 2)) +
@@ -602,6 +937,27 @@
           0.65 * Math.sin(x * 0.08 + z * 0.06) +
           duneHills
         );
+      };
+      const castleTerrain = {
+        centerX: 0,
+        centerZ: 172,
+        radius: 48,
+        blendRadius: 40,
+        height: naturalTerrainHeight(0, 172)
+      };
+      const terrainHeight = (x, z) => {
+        const distance = Math.hypot(x - castleTerrain.centerX, z - castleTerrain.centerZ);
+        const naturalHeight = naturalTerrainHeight(x, z);
+        if (distance <= castleTerrain.radius) return castleTerrain.height;
+        if (distance < castleTerrain.radius + castleTerrain.blendRadius) {
+          const blend = THREE.MathUtils.smoothstep(
+            distance,
+            castleTerrain.radius,
+            castleTerrain.radius + castleTerrain.blendRadius
+          );
+          return THREE.MathUtils.lerp(castleTerrain.height, naturalHeight, blend);
+        }
+        return naturalHeight;
       };
       const terrainGeometry = new THREE.BufferGeometry();
       const terrainPositions = [];
@@ -641,6 +997,247 @@
       const sand = new THREE.Mesh(terrainGeometry, sandMat);
       sand.receiveShadow = true;
       scene.add(sand);
+
+      const sandGrainRadius = 0.055;
+      const sandGrainDiameter = sandGrainRadius * 2;
+      const maxSandGrains = 2600;
+      const sandHashWidth = 256;
+      const sandHashDepth = 512;
+      const sandGrains = [];
+      const sandBuckets = new Map();
+      const sandBucketNext = new Int32Array(maxSandGrains);
+      const sandGrainMesh = new THREE.InstancedMesh(
+        new THREE.SphereGeometry(sandGrainRadius, 8, 6),
+        new THREE.MeshStandardMaterial({ color: "#e6c992", roughness: 0.98 }),
+        maxSandGrains
+      );
+      sandGrainMesh.count = 0;
+      sandGrainMesh.castShadow = false;
+      sandGrainMesh.receiveShadow = false;
+      sandGrainMesh.frustumCulled = false;
+      scene.add(sandGrainMesh);
+      const sandGrainDummy = new THREE.Object3D();
+      const sandGrainColor = new THREE.Color();
+      const sandGrainRaycaster = new THREE.Raycaster();
+      const sandGrainPointer = new THREE.Vector2();
+      const sandGrainPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -terrainHeight(0, 12));
+      const sandGrainHit = new THREE.Vector3();
+      const sandGrainBounds = {
+        minX: fencedArea.minX + sandGrainRadius,
+        maxX: fencedArea.maxX - sandGrainRadius,
+        minZ: fencedArea.frontZ + sandGrainRadius,
+        maxZ: fencedArea.backZ - sandGrainRadius
+      };
+
+      function pourSand(x, z) {
+        const grainsToAdd = Math.min(42, maxSandGrains - sandGrains.length);
+        for (let i = 0; i < grainsToAdd; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const spread = Math.sqrt(Math.random()) * 0.22;
+          const grainX = THREE.MathUtils.clamp(x + Math.cos(angle) * spread, sandGrainBounds.minX, sandGrainBounds.maxX);
+          const grainZ = THREE.MathUtils.clamp(z + Math.sin(angle) * spread, sandGrainBounds.minZ, sandGrainBounds.maxZ);
+          const grain = {
+            x: grainX,
+            y: terrainHeight(grainX, grainZ) + 0.38 + Math.random() * 0.16,
+            z: grainZ,
+            vx: (Math.random() - 0.5) * 0.45,
+            vy: Math.random() * 0.35,
+            vz: (Math.random() - 0.5) * 0.45
+          };
+          sandGrains.push(grain);
+          sandGrainColor.setRGB(
+            0.78 + Math.random() * 0.12,
+            0.66 + Math.random() * 0.12,
+            0.43 + Math.random() * 0.12
+          );
+          sandGrainMesh.setColorAt(sandGrains.length - 1, sandGrainColor);
+        }
+        sandGrainMesh.count = sandGrains.length;
+        if (sandGrainMesh.instanceColor) sandGrainMesh.instanceColor.needsUpdate = true;
+      }
+
+      function constrainSandGrain(grain) {
+        if (grain.x < sandGrainBounds.minX) {
+          grain.x = sandGrainBounds.minX;
+          grain.vx = Math.max(0, grain.vx) * 0.15;
+        } else if (grain.x > sandGrainBounds.maxX) {
+          grain.x = sandGrainBounds.maxX;
+          grain.vx = Math.min(0, grain.vx) * 0.15;
+        }
+        if (grain.z < sandGrainBounds.minZ) {
+          grain.z = sandGrainBounds.minZ;
+          grain.vz = Math.max(0, grain.vz) * 0.15;
+        } else if (grain.z > sandGrainBounds.maxZ) {
+          grain.z = sandGrainBounds.maxZ;
+          grain.vz = Math.min(0, grain.vz) * 0.15;
+        }
+        const floor = terrainHeight(grain.x, grain.z) + sandGrainRadius;
+        if (grain.y < floor) {
+          grain.y = floor;
+          if (grain.vy < 0) grain.vy *= -0.035;
+          grain.vx *= 0.92;
+          grain.vz *= 0.92;
+        }
+      }
+
+      function constrainSandGrainToPlayer(grain) {
+        const playerY = character.position.y;
+        if (
+          character.position.x < sandGrainBounds.minX - 0.4 ||
+          character.position.x > sandGrainBounds.maxX + 0.4 ||
+          character.position.z < sandGrainBounds.minZ - 0.4 ||
+          character.position.z > sandGrainBounds.maxZ + 0.4 ||
+          grain.y < playerY + sandGrainRadius ||
+          grain.y > playerY + 1.55
+        ) return;
+        let dx = grain.x - character.position.x;
+        let dz = grain.z - character.position.z;
+        const minimumDistance = sandGrainRadius + 0.25;
+        const distanceSquared = dx * dx + dz * dz;
+        if (distanceSquared >= minimumDistance * minimumDistance) return;
+        if (distanceSquared < 0.000001) {
+          dx = minimumDistance;
+          dz = 0;
+        }
+        const distance = Math.sqrt(dx * dx + dz * dz);
+        const normalX = dx / distance;
+        const normalZ = dz / distance;
+        grain.x = character.position.x + normalX * minimumDistance;
+        grain.z = character.position.z + normalZ * minimumDistance;
+        const inwardSpeed = grain.vx * normalX + grain.vz * normalZ;
+        if (inwardSpeed < 0) {
+          grain.vx -= inwardSpeed * normalX;
+          grain.vz -= inwardSpeed * normalZ;
+        }
+      }
+
+      function stepSandPhysics(step) {
+        for (const grain of sandGrains) {
+          grain.vy -= 9.81 * step;
+          grain.x += grain.vx * step;
+          grain.y += grain.vy * step;
+          grain.z += grain.vz * step;
+          grain.vx *= 0.999;
+          grain.vy *= 0.999;
+          grain.vz *= 0.999;
+          constrainSandGrain(grain);
+        }
+
+        for (let iteration = 0; iteration < 3; iteration++) {
+          sandBuckets.clear();
+          for (let i = 0; i < sandGrains.length; i++) {
+            const grain = sandGrains[i];
+            const cellX = Math.floor(grain.x / sandGrainDiameter) + 128;
+            const cellY = Math.floor(grain.y / sandGrainDiameter);
+            const cellZ = Math.floor(grain.z / sandGrainDiameter) + 128;
+            const key = (cellY * sandHashDepth + cellZ) * sandHashWidth + cellX;
+            const previous = sandBuckets.get(key);
+            sandBucketNext[i] = previous === undefined ? -1 : previous;
+            sandBuckets.set(key, i);
+          }
+
+          for (let i = 0; i < sandGrains.length; i++) {
+            const grain = sandGrains[i];
+            const cellX = Math.floor(grain.x / sandGrainDiameter) + 128;
+            const cellY = Math.floor(grain.y / sandGrainDiameter);
+            const cellZ = Math.floor(grain.z / sandGrainDiameter) + 128;
+            for (let offsetX = -1; offsetX <= 1; offsetX++) {
+              for (let offsetY = -1; offsetY <= 1; offsetY++) {
+                for (let offsetZ = -1; offsetZ <= 1; offsetZ++) {
+                  const key =
+                    ((cellY + offsetY) * sandHashDepth + cellZ + offsetZ) * sandHashWidth +
+                    cellX + offsetX;
+                  for (
+                    let otherIndex = sandBuckets.get(key);
+                    otherIndex !== undefined && otherIndex !== -1;
+                    otherIndex = sandBucketNext[otherIndex]
+                  ) {
+                    if (otherIndex <= i) continue;
+                    const other = sandGrains[otherIndex];
+                    let dx = grain.x - other.x;
+                    let dy = grain.y - other.y;
+                    let dz = grain.z - other.z;
+                    let distanceSquared = dx * dx + dy * dy + dz * dz;
+                    if (distanceSquared >= sandGrainDiameter * sandGrainDiameter) continue;
+                    if (distanceSquared < 0.00000001) {
+                      dx = sandGrainRadius * 0.001;
+                      dy = 0;
+                      dz = sandGrainRadius * 0.001;
+                      distanceSquared = dx * dx + dz * dz;
+                    }
+                    const distance = Math.sqrt(distanceSquared);
+                    const normalX = dx / distance;
+                    const normalY = dy / distance;
+                    const normalZ = dz / distance;
+                    const correction = (sandGrainDiameter - distance) * 0.5 / distance;
+                    grain.x += dx * correction;
+                    grain.y += dy * correction;
+                    grain.z += dz * correction;
+                    other.x -= dx * correction;
+                    other.y -= dy * correction;
+                    other.z -= dz * correction;
+
+                    const closingSpeed =
+                      (grain.vx - other.vx) * normalX +
+                      (grain.vy - other.vy) * normalY +
+                      (grain.vz - other.vz) * normalZ;
+                    let impulse = 0;
+                    if (closingSpeed < 0) {
+                      impulse = closingSpeed * 0.515;
+                      grain.vx -= impulse * normalX;
+                      grain.vy -= impulse * normalY;
+                      grain.vz -= impulse * normalZ;
+                      other.vx += impulse * normalX;
+                      other.vy += impulse * normalY;
+                      other.vz += impulse * normalZ;
+                    }
+                    const relativeX = grain.vx - other.vx;
+                    const relativeY = grain.vy - other.vy;
+                    const relativeZ = grain.vz - other.vz;
+                    const normalSpeed = relativeX * normalX + relativeY * normalY + relativeZ * normalZ;
+                    const tangentX = relativeX - normalSpeed * normalX;
+                    const tangentY = relativeY - normalSpeed * normalY;
+                    const tangentZ = relativeZ - normalSpeed * normalZ;
+                    const tangentSpeed = Math.hypot(tangentX, tangentY, tangentZ);
+                    if (tangentSpeed > 0.0001) {
+                      const friction = Math.min(tangentSpeed * 0.22, Math.max(Math.abs(impulse) * 0.55, 0.006));
+                      const frictionScale = friction / tangentSpeed;
+                      grain.vx -= tangentX * frictionScale;
+                      grain.vy -= tangentY * frictionScale;
+                      grain.vz -= tangentZ * frictionScale;
+                      other.vx += tangentX * frictionScale;
+                      other.vy += tangentY * frictionScale;
+                      other.vz += tangentZ * frictionScale;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          for (const grain of sandGrains) {
+            constrainSandGrain(grain);
+            constrainSandGrainToPlayer(grain);
+          }
+        }
+      }
+
+      function updateSandPhysics(delta) {
+        if (sandGrains.length === 0) return;
+        let remaining = Math.min(delta, 1 / 30);
+        const step = 1 / 60;
+        while (remaining > 0) {
+          const substep = Math.min(step, remaining);
+          stepSandPhysics(substep);
+          remaining -= substep;
+        }
+        for (let i = 0; i < sandGrains.length; i++) {
+          const grain = sandGrains[i];
+          sandGrainDummy.position.set(grain.x, grain.y, grain.z);
+          sandGrainDummy.updateMatrix();
+          sandGrainMesh.setMatrixAt(i, sandGrainDummy.matrix);
+        }
+        sandGrainMesh.instanceMatrix.needsUpdate = true;
+      }
 
       const seabed = new THREE.Mesh(new THREE.PlaneGeometry(180, 100), wetSandMat);
       seabed.rotation.x = -Math.PI / 2;
@@ -689,6 +1286,7 @@
       }
 
       function addPalm(x, z, scale = 1, parent = scene) {
+        if (overlapsFencedArea(x, z, 4 * scale)) return;
         const group = new THREE.Group();
         group.position.set(x, terrainHeight(x, z), z);
         group.scale.setScalar(scale);
@@ -832,6 +1430,9 @@
       ].forEach(([x, z, scale]) => addPalm(x, z, scale));
 
       function addUmbrella(x, z, canopyColors, towelColor, parent = scene) {
+        const towelX = x + 2.15;
+        const towelZ = z + 0.9;
+        if (overlapsFencedArea(x, z, 1.65) || overlapsFencedArea(towelX, towelZ, 1, 1.35)) return;
         const group = new THREE.Group();
         const ground = terrainHeight(x, z);
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 2.4, 8), mat("#fff3d4"));
@@ -868,8 +1469,6 @@
         group.add(canopyCap);
 
         const towelGroup = new THREE.Group();
-        const towelX = x + 2.15;
-        const towelZ = z + 0.9;
         towelGroup.position.set(towelX, terrainHeight(towelX, towelZ) + 0.06, towelZ);
         towelGroup.rotation.y = -0.3;
         const towel = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.055, 2.6), mat(towelColor));
@@ -884,6 +1483,664 @@
         group.add(towelGroup);
         parent.add(group);
       }
+
+      function addBeachFence() {
+        const xStart = fencedArea.minX;
+        const xEnd = fencedArea.maxX;
+        const zFront = fencedArea.frontZ;
+        const zBack = fencedArea.backZ;
+        const gateWidth = 3.4;
+        const gateLeft = -gateWidth / 2;
+        const gateRight = gateWidth / 2;
+        const postMaterial = mat("#805538");
+        const railMaterial = mat("#a9784c");
+        const picketMaterials = [mat("#b48759"), mat("#a77a4e"), mat("#bd9364")];
+        const up = new THREE.Vector3(0, 1, 0);
+
+        function addBeam(parent, start, end, radius, material) {
+          const direction = new THREE.Vector3().subVectors(end, start);
+          const beam = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius, radius, 1, 8),
+            material
+          );
+          beam.position.copy(start).add(end).multiplyScalar(0.5);
+          beam.quaternion.setFromUnitVectors(up, direction.clone().normalize());
+          beam.scale.y = direction.length();
+          beam.castShadow = true;
+          parent.add(beam);
+        }
+
+        function addFenceRun(startX, startZ, endX, endZ) {
+          const length = Math.hypot(endX - startX, endZ - startZ);
+          const postCount = Math.ceil(length / 1.8);
+          const points = [];
+          for (let i = 0; i <= postCount; i++) {
+            const t = i / postCount;
+            const x = THREE.MathUtils.lerp(startX, endX, t);
+            const z = THREE.MathUtils.lerp(startZ, endZ, t);
+            const ground = terrainHeight(x, z);
+            points.push({ x, z, ground });
+            const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.18, 0.16), postMaterial);
+            post.position.set(x, ground + 0.56, z);
+            post.castShadow = true;
+            scene.add(post);
+          }
+
+          for (let i = 0; i < postCount; i++) {
+            const a = points[i];
+            const b = points[i + 1];
+            for (const height of [0.38, 0.78]) {
+              addBeam(
+                scene,
+                new THREE.Vector3(a.x, a.ground + height, a.z),
+                new THREE.Vector3(b.x, b.ground + height, b.z),
+                0.065,
+                railMaterial
+              );
+            }
+            for (let slat = 1; slat <= 3; slat++) {
+              const t = slat / 4;
+              const x = THREE.MathUtils.lerp(a.x, b.x, t);
+              const z = THREE.MathUtils.lerp(a.z, b.z, t);
+              const ground = terrainHeight(x, z);
+              const picket = new THREE.Mesh(
+                new THREE.BoxGeometry(0.09, 0.76, 0.11),
+                picketMaterials[(i + slat) % picketMaterials.length]
+              );
+              picket.position.set(x, ground + 0.57, z);
+              picket.castShadow = true;
+              scene.add(picket);
+            }
+          }
+        }
+
+        addFenceRun(xStart, zFront, gateLeft, zFront);
+        addFenceRun(gateRight, zFront, xEnd, zFront);
+        addFenceRun(xStart, zFront, xStart, zBack);
+        addFenceRun(xEnd, zFront, xEnd, zBack);
+        addFenceRun(xStart, zBack, xEnd, zBack);
+
+        const gate = new THREE.Group();
+        gate.position.set(gateLeft, terrainHeight(gateLeft, zFront) + 0.04, zFront);
+        gate.rotation.y = -0.55;
+        const gateRailMaterial = mat("#91653f");
+        const gatePicketMaterial = mat("#b48759");
+        for (const height of [0.18, 0.83]) {
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(gateWidth, 0.12, 0.12), gateRailMaterial);
+          rail.position.set(gateWidth / 2, height, 0);
+          rail.castShadow = true;
+          gate.add(rail);
+        }
+        for (let i = 0; i <= 7; i++) {
+          const picket = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.94, 0.12), gatePicketMaterial);
+          picket.position.set(0.18 + i * 0.43, 0.51, 0);
+          picket.castShadow = true;
+          gate.add(picket);
+        }
+        const brace = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.92, 0.13), gateRailMaterial);
+        brace.position.set(gateWidth / 2, 0.51, -0.075);
+        brace.rotation.z = Math.atan2(0.92, gateWidth - 0.36);
+        brace.castShadow = true;
+        gate.add(brace);
+        for (const height of [0.28, 0.72]) {
+          const hinge = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.07, 0.16), mat("#566268"));
+          hinge.position.set(0.07, height, -0.04);
+          gate.add(hinge);
+        }
+        const latch = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), mat("#d7bd82"));
+        latch.position.set(gateWidth - 0.22, 0.56, -0.1);
+        gate.add(latch);
+        scene.add(gate);
+      }
+
+      addBeachFence();
+
+      const castleCenterX = castleTerrain.centerX;
+      const castleCenterZ = castleTerrain.centerZ;
+      const castleFloorY = terrainHeight(castleCenterX, castleCenterZ);
+      const castleArrival = { x: 0, z: 164 };
+      const beachPortalPosition = { x: 0, z: 14.5 };
+      const castleBricks = [];
+      const castleBrickColors = ["#d9b57d", "#e7c68f", "#cba36c", "#e2bd82", "#c7a06c"];
+      const castleBrickGeometry = new THREE.BoxGeometry(0.58, 0.32, 0.54);
+      const castleBrickMaterial = new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 1 });
+      let castleBrickMesh;
+      let castleVisibleBricks = [];
+
+      function addCastleBrick(x, y, z) {
+        castleBricks.push({
+          x, y, z,
+          color: new THREE.Color(castleBrickColors[Math.floor(Math.random() * castleBrickColors.length)]),
+          alive: true
+        });
+      }
+
+      const castleFloorHeight = 4;
+      const castleFloors = [0, 1, 2];
+      let castleLevel = 0;
+      function castleStairHeight(x, z) {
+        const firstStart = castleCenterZ - 10.8;
+        const firstEnd = castleCenterZ + 1.2;
+        if (Math.abs(x + 8.1) < 1.35 && z >= firstStart - 0.6 && z <= firstEnd + 0.6) {
+          const progress = THREE.MathUtils.clamp((z - firstStart) / (firstEnd - firstStart), 0, 1);
+          if (progress > 0.96) castleLevel = Math.max(castleLevel, 1);
+          else if (progress < 0.04) castleLevel = 0;
+          return castleFloorY + 0.18 + progress * castleFloorHeight;
+        }
+        const secondStart = castleCenterZ + 10.8;
+        const secondEnd = castleCenterZ - 1.2;
+        if (Math.abs(x - 8.1) < 1.35 && z >= secondEnd - 0.6 && z <= secondStart + 0.6) {
+          const progress = THREE.MathUtils.clamp((secondStart - z) / (secondStart - secondEnd), 0, 1);
+          if (progress > 0.96) castleLevel = 2;
+          else if (progress < 0.04) castleLevel = 1;
+          return castleFloorY + 0.18 + (1 + progress) * castleFloorHeight;
+        }
+        return castleFloorY + 0.18 + castleLevel * castleFloorHeight;
+      }
+      for (let layer = 0; layer < 36; layer++) {
+        const y = castleFloorY + 0.16 + layer * 0.34;
+        const floorLevel = Math.floor(layer / 12);
+        for (let column = -20; column <= 20; column++) {
+          const x = castleCenterX + column * 0.6;
+          const doorOpening = floorLevel === 0 && Math.abs(x) < 1.8 && layer < 8;
+          const windowOpening = floorLevel > 0 && Math.abs(x) > 4.2 && Math.abs(x) < 5.5 &&
+            layer % 12 >= 3 && layer % 12 <= 7;
+          if (!doorOpening && !windowOpening) {
+            addCastleBrick(x, y, castleCenterZ - 12);
+            addCastleBrick(x, y, castleCenterZ - 11.4);
+          }
+          addCastleBrick(x, y, castleCenterZ + 12);
+          addCastleBrick(x, y, castleCenterZ + 11.4);
+        }
+        for (let column = -40; column <= 40; column++) {
+          const z = castleCenterZ + column * 0.3;
+          addCastleBrick(castleCenterX - 12, y, z);
+          addCastleBrick(castleCenterX - 11.4, y, z);
+          addCastleBrick(castleCenterX + 12, y, z);
+          addCastleBrick(castleCenterX + 11.4, y, z);
+        }
+      }
+
+      for (const towerX of [-11, 11]) {
+        for (const towerZ of [castleCenterZ - 11, castleCenterZ + 11]) {
+          for (let layer = 0; layer < 36; layer++) {
+            const y = castleFloorY + 0.16 + layer * 0.34;
+            for (let segment = 0; segment < 18; segment++) {
+              const angle = (segment / 18) * Math.PI * 2;
+              addCastleBrick(
+                towerX + Math.cos(angle) * 2,
+                y,
+                towerZ + Math.sin(angle) * 2
+              );
+            }
+          }
+        }
+      }
+
+      const castleDecor = new THREE.Group();
+      const castleFloorMaterials = [
+        new THREE.MeshStandardMaterial({ color: "#b28a5c", roughness: 0.96 }),
+        new THREE.MeshStandardMaterial({ color: "#bb9568", roughness: 0.94 }),
+        new THREE.MeshStandardMaterial({ color: "#a9845b", roughness: 0.94 })
+      ];
+      const castleTrimMaterial = new THREE.MeshStandardMaterial({ color: "#f0d7a4", roughness: 0.84 });
+      const castleWoodMaterial = new THREE.MeshStandardMaterial({ color: "#79513b", roughness: 0.9 });
+      const castleClothMaterial = new THREE.MeshStandardMaterial({ color: "#9b6b68", roughness: 0.98 });
+      const castleBlueMaterial = new THREE.MeshStandardMaterial({ color: "#6d9e9c", roughness: 0.86 });
+      const castleLightMaterial = new THREE.MeshBasicMaterial({ color: "#ffd48b" });
+      function addCastleRoomProp(geometry, material, x, y, z, castShadow = true) {
+        const prop = new THREE.Mesh(geometry, material);
+        prop.position.set(x, y, z);
+        prop.castShadow = castShadow;
+        prop.receiveShadow = true;
+        castleDecor.add(prop);
+        return prop;
+      }
+
+      for (const level of castleFloors) {
+        const floorY = castleFloorY + level * castleFloorHeight;
+        const floor = addCastleRoomProp(
+          new THREE.BoxGeometry(22.5, 0.3, 22.5),
+          castleFloorMaterials[level],
+          castleCenterX,
+          floorY + 0.02,
+          castleCenterZ,
+          false
+        );
+        floor.receiveShadow = true;
+        const rug = addCastleRoomProp(
+          new THREE.BoxGeometry(7.5, 0.035, 5.5),
+          level === 1 ? castleBlueMaterial : castleClothMaterial,
+          castleCenterX,
+          floorY + 0.2,
+          castleCenterZ + (level === 2 ? -2 : 1),
+          false
+        );
+        for (const side of [-1, 1]) {
+          addCastleRoomProp(
+            new THREE.BoxGeometry(3.1, 0.12, 0.32),
+            castleTrimMaterial,
+            side * 8.8,
+            floorY + 0.23,
+            castleCenterZ + 1
+          );
+          addCastleRoomProp(
+            new THREE.BoxGeometry(0.32, 0.12, 3.1),
+            castleTrimMaterial,
+            side * 8.8,
+            floorY + 0.23,
+            castleCenterZ + 1
+          );
+          const pillar = addCastleRoomProp(
+            new THREE.CylinderGeometry(0.34, 0.42, 3.7, 8),
+            castleTrimMaterial,
+            side * 9.5,
+            floorY + 1.95,
+            castleCenterZ + (level === 1 ? -5 : 5)
+          );
+          pillar.rotation.y = Math.PI / 8;
+        }
+        addCastleRoomProp(
+          new THREE.BoxGeometry(2.4, 0.26, 1.1),
+          castleWoodMaterial,
+          -5.8,
+          floorY + 0.5,
+          castleCenterZ + 4
+        );
+        addCastleRoomProp(
+          new THREE.BoxGeometry(2.15, 0.16, 0.9),
+          castleTrimMaterial,
+          -5.8,
+          floorY + 0.7,
+          castleCenterZ + 4
+        );
+        addCastleRoomProp(
+          new THREE.BoxGeometry(3.5, 0.16, 1),
+          castleWoodMaterial,
+          5.8,
+          floorY + 0.95,
+          castleCenterZ - 3
+        );
+        for (let seat = 0; seat < 3; seat++) {
+          addCastleRoomProp(
+            new THREE.BoxGeometry(0.78, 0.72, 0.74),
+            castleTrimMaterial,
+            4.65 + seat * 1.12,
+            floorY + 0.43,
+            castleCenterZ - 3
+          );
+        }
+        for (const side of [-1, 1]) {
+          const torch = addCastleRoomProp(
+            new THREE.BoxGeometry(0.18, 1.35, 0.18),
+            castleWoodMaterial,
+            side * 9.6,
+            floorY + 2.1,
+            castleCenterZ
+          );
+          torch.rotation.z = side * -0.12;
+          addCastleRoomProp(
+            new THREE.SphereGeometry(0.2, 8, 6),
+            castleLightMaterial,
+            side * 9.6,
+            floorY + 2.9,
+            castleCenterZ
+          );
+        }
+      }
+      scene.add(castleDecor);
+
+      const stairMaterial = new THREE.MeshStandardMaterial({ color: "#c5a073", roughness: 0.94 });
+      function addCastleStaircase(x, startZ, endZ, startLevel, endLevel) {
+        const steps = 20;
+        for (let i = 0; i < steps; i++) {
+          const ratio = (i + 0.5) / steps;
+          const z = THREE.MathUtils.lerp(startZ, endZ, ratio);
+          const y = castleFloorY + THREE.MathUtils.lerp(startLevel, endLevel, ratio) * castleFloorHeight;
+          addCastleRoomProp(new THREE.BoxGeometry(2.2, 0.22, 0.68), stairMaterial, x, y, z);
+        }
+      }
+      addCastleStaircase(-8.1, castleCenterZ - 10.8, castleCenterZ + 1.2, 0, 1);
+      addCastleStaircase(8.1, castleCenterZ + 10.8, castleCenterZ - 1.2, 1, 2);
+
+      castleBrickMesh = new THREE.InstancedMesh(castleBrickGeometry, castleBrickMaterial, castleBricks.length);
+      castleBrickMesh.castShadow = true;
+      castleBrickMesh.receiveShadow = true;
+      castleBrickMesh.frustumCulled = false;
+      scene.add(castleBrickMesh);
+
+      const castleBrickDummy = new THREE.Object3D();
+      const castleBrickColor = new THREE.Color();
+      const castleBricksCount = document.querySelector("#castle-bricks-left");
+      const castleHud = document.querySelector("#castle-hud");
+      function rebuildCastleMesh() {
+        castleVisibleBricks = [];
+        for (const brick of castleBricks) {
+          if (!brick.alive) continue;
+          const index = castleVisibleBricks.length;
+          castleVisibleBricks.push(brick);
+          castleBrickDummy.position.set(brick.x, brick.y, brick.z);
+          castleBrickDummy.updateMatrix();
+          castleBrickMesh.setMatrixAt(index, castleBrickDummy.matrix);
+          castleBrickMesh.setColorAt(index, brick.color);
+        }
+        castleBrickMesh.count = castleVisibleBricks.length;
+        castleBrickMesh.instanceMatrix.needsUpdate = true;
+        if (castleBrickMesh.instanceColor) castleBrickMesh.instanceColor.needsUpdate = true;
+        if (castleBricksCount) castleBricksCount.textContent = castleVisibleBricks.length.toLocaleString();
+      }
+      rebuildCastleMesh();
+
+      const castleArena = new THREE.Mesh(
+        new THREE.CircleGeometry(castleTerrain.radius, 64),
+        new THREE.MeshStandardMaterial({ color: "#d9bd8e", roughness: 0.98 })
+      );
+      castleArena.rotation.x = -Math.PI / 2;
+      castleArena.position.set(castleCenterX, castleFloorY - 0.06, castleCenterZ);
+      castleArena.receiveShadow = true;
+      scene.add(castleArena);
+
+      function createPortal(x, z, y, scale = 1) {
+        const portal = new THREE.Group();
+        portal.position.set(x, y, z);
+        portal.scale.setScalar(scale);
+        const stone = mat("#9a7958");
+        const trim = mat("#d8c29a");
+        const glow = new THREE.MeshBasicMaterial({
+          color: "#65e6ef", transparent: true, opacity: 0.62,
+          side: THREE.DoubleSide, depthWrite: false
+        });
+        const field = new THREE.Mesh(new THREE.CircleGeometry(1.72, 40), glow);
+        field.position.set(0, 2.18, 0);
+        portal.add(field);
+        const ring = new THREE.Mesh(
+          new THREE.TorusGeometry(2.05, 0.19, 12, 48),
+          new THREE.MeshStandardMaterial({
+            color: "#71d9de", emissive: "#248a98", emissiveIntensity: 0.62, roughness: 0.28
+          })
+        );
+        ring.position.set(0, 2.18, 0.04);
+        portal.add(ring);
+        for (const side of [-1, 1]) {
+          const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.52, 4.45, 0.62), stone);
+          pillar.position.set(side * 2.25, 2.2, 0);
+          pillar.castShadow = true;
+          pillar.receiveShadow = true;
+          portal.add(pillar);
+          const cap = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.32, 0.82), trim);
+          cap.position.set(side * 2.25, 4.5, 0);
+          portal.add(cap);
+          const base = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.38, 0.9), trim);
+          base.position.set(side * 2.25, 0.2, 0);
+          portal.add(base);
+        }
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(4.9, 0.42, 0.78), stone);
+        lintel.position.set(0, 4.55, 0);
+        lintel.castShadow = true;
+        portal.add(lintel);
+        scene.add(portal);
+        return { group: portal, ring, field };
+      }
+
+      const beachPortal = createPortal(
+        beachPortalPosition.x,
+        beachPortalPosition.z,
+        terrainHeight(beachPortalPosition.x, beachPortalPosition.z)
+      );
+      const castlePortal = createPortal(
+        castleCenterX,
+        castleArrival.z,
+        terrainHeight(castleCenterX, castleArrival.z),
+        1.05
+      );
+      castlePortal.group.visible = false;
+
+      const maxCastleDebris = castleBricks.length;
+      const castleDebris = [];
+      const castleDebrisMesh = new THREE.InstancedMesh(
+        new THREE.BoxGeometry(0.22, 0.18, 0.2),
+        new THREE.MeshStandardMaterial({ color: "#ffffff", roughness: 1 }),
+        maxCastleDebris
+      );
+      castleDebrisMesh.count = 0;
+      castleDebrisMesh.frustumCulled = false;
+      scene.add(castleDebrisMesh);
+      const castleDebrisDummy = new THREE.Object3D();
+
+      function throwCastleDebris(brick, center, force) {
+        const dx = brick.x - center.x;
+        const dy = brick.y - center.y;
+        const dz = brick.z - center.z;
+        const distance = Math.max(0.45, Math.hypot(dx, dy, dz));
+        const impulse = force / (1 + distance * 0.35);
+        const pixel = {
+          x: brick.x + (Math.random() - 0.5) * 0.36,
+          y: brick.y,
+          z: brick.z + (Math.random() - 0.5) * 0.36,
+          vx: (dx / distance) * impulse + (Math.random() - 0.5) * 2.6,
+          vy: 2 + Math.random() * 3 + Math.max(0, dy / distance) * impulse,
+          vz: (dz / distance) * impulse + (Math.random() - 0.5) * 2.6,
+          rx: Math.random() * Math.PI, ry: Math.random() * Math.PI, rz: Math.random() * Math.PI,
+          spinX: (Math.random() - 0.5) * 8,
+          spinY: (Math.random() - 0.5) * 8,
+          spinZ: (Math.random() - 0.5) * 8,
+          scaleX: 0.75 + Math.random() * 0.35,
+          scaleY: 0.8 + Math.random() * 0.35,
+          scaleZ: 0.75 + Math.random() * 0.35,
+          color: brick.color.clone(),
+          active: true,
+          index: castleDebris.length
+        };
+        castleDebris.push(pixel);
+        castleDebrisDummy.position.set(pixel.x, pixel.y, pixel.z);
+        castleDebrisDummy.rotation.set(pixel.rx, pixel.ry, pixel.rz);
+        castleDebrisDummy.scale.set(pixel.scaleX, pixel.scaleY, pixel.scaleZ);
+        castleDebrisDummy.updateMatrix();
+        castleDebrisMesh.setMatrixAt(pixel.index, castleDebrisDummy.matrix);
+        castleDebrisMesh.setColorAt(pixel.index, pixel.color);
+        castleDebrisMesh.count = castleDebris.length;
+        castleDebrisMesh.instanceMatrix.needsUpdate = true;
+        if (castleDebrisMesh.instanceColor) castleDebrisMesh.instanceColor.needsUpdate = true;
+      }
+
+      function damageCastle(center, radius, force) {
+        let destroyed = 0;
+        for (const brick of castleBricks) {
+          if (!brick.alive) continue;
+          const distance = Math.hypot(brick.x - center.x, brick.y - center.y, brick.z - center.z);
+          if (distance > radius) continue;
+          brick.alive = false;
+          destroyed++;
+          throwCastleDebris(brick, center, force);
+        }
+        if (destroyed > 0) rebuildCastleMesh();
+        return destroyed;
+      }
+
+      const castleBombs = [];
+      const castleBombGeometry = new THREE.SphereGeometry(0.28, 12, 10);
+      const castleBombMaterial = new THREE.MeshStandardMaterial({
+        color: "#353b43", roughness: 0.62, emissive: "#622c12", emissiveIntensity: 0.35
+      });
+      const castleToolSpecs = [
+        { id: "bomb", key: "Digit1", label: "Bomb gun" },
+        { id: "blaster", key: "Digit2", label: "Sand blaster" },
+        { id: "water", key: "Digit3", label: "Water cannon" },
+        { id: "mallet", key: "Digit4", label: "Giant mallet" }
+      ];
+      let selectedCastleTool = "bomb";
+      let castleMode = false;
+      let gameRunning = false;
+      let hasStarted = false;
+      let nextCastleShot = 0;
+      const castleRaycaster = new THREE.Raycaster();
+      const castlePointer = new THREE.Vector2();
+      const castleImpact = new THREE.Vector3();
+      const toolButtons = Array.from(document.querySelectorAll(".tool-button"));
+
+      function selectCastleTool(toolId) {
+        selectedCastleTool = toolId;
+        toolButtons.forEach((button) => {
+          button.setAttribute("aria-pressed", String(button.dataset.tool === selectedCastleTool));
+        });
+      }
+      toolButtons.forEach((button) => {
+        button.addEventListener("click", () => selectCastleTool(button.dataset.tool));
+      });
+
+      const castleImpactEffects = [];
+      function showCastleImpact(position, color, size) {
+        const effect = new THREE.Mesh(
+          new THREE.SphereGeometry(1, 12, 8),
+          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.8 })
+        );
+        effect.position.copy(position);
+        effect.scale.setScalar(0.15);
+        effect.userData = { life: 0.32, size };
+        scene.add(effect);
+        castleImpactEffects.push(effect);
+      }
+
+      function detonateCastleBomb(bomb) {
+        const center = bomb.mesh.position.clone();
+        damageCastle(center, 5.6, 14);
+        showCastleImpact(center, "#ffc66d", 5.8);
+        scene.remove(bomb.mesh);
+        const bombIndex = castleBombs.indexOf(bomb);
+        if (bombIndex >= 0) castleBombs.splice(bombIndex, 1);
+      }
+
+      function fireCastleTool(ray) {
+        if (!castleMode || performance.now() < nextCastleShot) return;
+        nextCastleShot = performance.now() + (selectedCastleTool === "bomb" ? 420 : 180);
+        castleRaycaster.set(ray.origin, ray.direction);
+        castleRaycaster.far = 60;
+        const hit = castleRaycaster.intersectObject(castleBrickMesh, false)[0];
+        const target = hit ? hit.point.clone() : ray.origin.clone().addScaledVector(ray.direction, 32);
+
+        if (selectedCastleTool === "bomb") {
+          if (castleBombs.length >= 8) detonateCastleBomb(castleBombs[0]);
+          const mesh = new THREE.Mesh(castleBombGeometry, castleBombMaterial);
+          mesh.castShadow = true;
+          const launchPosition = new THREE.Vector3(
+            character.position.x,
+            character.position.y + 1.35,
+            character.position.z
+          );
+          const flightTime = THREE.MathUtils.clamp(launchPosition.distanceTo(target) / 18, 0.65, 1.35);
+          const displacement = target.clone().sub(launchPosition);
+          const velocity = displacement.multiplyScalar(1 / flightTime);
+          velocity.y += 4.9 * flightTime;
+          mesh.position.copy(launchPosition);
+          scene.add(mesh);
+          castleBombs.push({
+            mesh,
+            vx: velocity.x,
+            vy: velocity.y,
+            vz: velocity.z,
+            fuse: flightTime,
+            target
+          });
+          return;
+        }
+
+        if (!hit) return;
+        const spec = selectedCastleTool === "blaster"
+          ? { radius: 1.35, force: 5, color: "#e8d0a6" }
+          : selectedCastleTool === "water"
+            ? { radius: 2.6, force: 8, color: "#63dbe9" }
+            : { radius: 3.15, force: 11, color: "#ffbd68" };
+        damageCastle(hit.point, spec.radius, spec.force);
+        showCastleImpact(hit.point, spec.color, spec.radius);
+      }
+
+      function updateCastlePhysics(delta, time) {
+        for (let i = castleBombs.length - 1; i >= 0; i--) {
+          const bomb = castleBombs[i];
+          const next = bomb.mesh.position.clone().add(
+            new THREE.Vector3(bomb.vx, bomb.vy, bomb.vz).multiplyScalar(delta)
+          );
+          const travel = next.clone().sub(bomb.mesh.position);
+          if (travel.lengthSq() > 0) {
+            castleRaycaster.set(bomb.mesh.position, travel.normalize());
+            castleRaycaster.far = travel.length() + 0.35;
+            const hit = castleRaycaster.intersectObject(castleBrickMesh, false)[0];
+            if (hit) {
+              bomb.mesh.position.copy(hit.point);
+              detonateCastleBomb(bomb);
+              continue;
+            }
+          }
+          bomb.mesh.position.copy(next);
+          bomb.vy -= 9.8 * delta;
+          bomb.fuse -= delta;
+          bomb.mesh.rotation.x += delta * 4;
+          bomb.mesh.rotation.z += delta * 3;
+          if (bomb.fuse <= 0 || bomb.mesh.position.y < castleFloorY + 0.3) {
+            detonateCastleBomb(bomb);
+          }
+        }
+
+        let movingDebris = false;
+        for (const chip of castleDebris) {
+          if (!chip.active) continue;
+          chip.vy -= 9.8 * delta;
+          chip.x += chip.vx * delta;
+          chip.y += chip.vy * delta;
+          chip.z += chip.vz * delta;
+          chip.rx += chip.spinX * delta;
+          chip.ry += chip.spinY * delta;
+          chip.rz += chip.spinZ * delta;
+          chip.x = THREE.MathUtils.clamp(chip.x, castleCenterX - 30, castleCenterX + 30);
+          chip.z = THREE.MathUtils.clamp(chip.z, castleCenterZ - 30, castleCenterZ + 30);
+          const floor = castleFloorY + 0.29;
+          if (chip.y < floor) {
+            chip.y = floor;
+            chip.vy = Math.abs(chip.vy) * 0.18;
+            chip.vx *= 0.64;
+            chip.vz *= 0.64;
+            chip.spinX *= 0.52;
+            chip.spinY *= 0.52;
+            chip.spinZ *= 0.52;
+            if (Math.abs(chip.vy) < 0.32 && Math.hypot(chip.vx, chip.vz) < 0.28) {
+              chip.vx = 0;
+              chip.vy = 0;
+              chip.vz = 0;
+              chip.spinX = 0;
+              chip.spinY = 0;
+              chip.spinZ = 0;
+              chip.active = false;
+            }
+          }
+          castleDebrisDummy.position.set(chip.x, chip.y, chip.z);
+          castleDebrisDummy.rotation.set(chip.rx, chip.ry, chip.rz);
+          castleDebrisDummy.scale.set(chip.scaleX, chip.scaleY, chip.scaleZ);
+          castleDebrisDummy.updateMatrix();
+          castleDebrisMesh.setMatrixAt(chip.index, castleDebrisDummy.matrix);
+          movingDebris = true;
+        }
+        if (movingDebris) castleDebrisMesh.instanceMatrix.needsUpdate = true;
+
+        for (let i = castleImpactEffects.length - 1; i >= 0; i--) {
+          const effect = castleImpactEffects[i];
+          effect.userData.life -= delta;
+          const phase = 1 - Math.max(0, effect.userData.life) / 0.32;
+          effect.scale.setScalar(0.15 + phase * effect.userData.size);
+          effect.material.opacity = 0.8 * (1 - phase);
+          if (effect.userData.life <= 0) {
+            scene.remove(effect);
+            effect.geometry.dispose();
+            effect.material.dispose();
+            castleImpactEffects.splice(i, 1);
+          }
+        }
+
+        beachPortal.ring.rotation.z = Math.sin(time * 0.8) * 0.08;
+        beachPortal.field.material.opacity = 0.52 + Math.sin(time * 2.3) * 0.12;
+        castlePortal.ring.rotation.z = Math.sin(time * 0.8) * 0.08;
+        castlePortal.field.material.opacity = 0.52 + Math.sin(time * 2.3) * 0.12;
+      }
+
       [
         [7, 11, ["#ee7965", "#fff1d2"], "#70c9bb"],
         [-22, 8, ["#f1bd57", "#fff2d6"], "#e98778"],
@@ -932,6 +2189,7 @@
         collectibleSpecs.push([type, icon, x, z]);
       }
       const collectibles = collectibleSpecs.map(([type, icon, x, z], index) => {
+        const id = `beach:${index}`;
         const group = new THREE.Group();
         const ground = terrainHeight(x, z);
         group.position.set(x, ground + 0.045, z);
@@ -995,7 +2253,7 @@
           }
         });
         scene.add(group);
-        return { type, icon, group, collected: false };
+        return { id, type, icon, group, collected: false };
       });
 
       const worldChunks = new Map();
@@ -1366,10 +2624,94 @@
         characterModel.add(legPivot);
         limbs.push({ mesh: legPivot, side, type: "leg", baseY: legPivot.position.y });
       }
+      const handTrowel = new THREE.Group();
+      const trowelHandle = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.025, 0.032, 0.38, 8),
+        mat("#795c3f", 0.85)
+      );
+      trowelHandle.position.y = -0.02;
+      trowelHandle.rotation.z = -0.22;
+      handTrowel.add(trowelHandle);
+      const trowelBlade = new THREE.Mesh(
+        new THREE.BoxGeometry(0.18, 0.035, 0.16),
+        new THREE.MeshStandardMaterial({ color: "#b9c9c4", metalness: 0.72, roughness: 0.34 })
+      );
+      trowelBlade.position.set(0.08, -0.25, 0.02);
+      trowelBlade.rotation.x = -0.25;
+      handTrowel.add(trowelBlade);
+      handTrowel.position.set(0.43, 0.46, 0.1);
+      handTrowel.visible = false;
+      characterModel.add(handTrowel);
       character.position.set(0, terrainHeight(0, 4), 4);
       character.rotation.y = Math.PI;
       scene.add(character);
       updateWorldChunks(character.position.x, character.position.z);
+
+      const cameraToggleButton = document.querySelector("#camera-toggle");
+      function updateCameraMode() {
+        characterModel.visible = !firstPersonCamera;
+        cameraToggleButton.setAttribute("aria-pressed", String(firstPersonCamera));
+        cameraToggleButton.setAttribute(
+          "aria-label",
+          firstPersonCamera ? "Switch to third-person view" : "Switch to first-person view"
+        );
+        cameraToggleButton.innerHTML = `<kbd>V</kbd> &nbsp; ${firstPersonCamera ? "Third-person" : "First-person"}`;
+      }
+      function toggleCameraMode() {
+        firstPersonCamera = !firstPersonCamera;
+        updateCameraMode();
+      }
+      cameraToggleButton.addEventListener("click", toggleCameraMode);
+      updateCameraMode();
+
+      const portalButton = document.querySelector("#portal");
+      let nearPortal = false;
+      function teleportThroughPortal() {
+        if (!nearPortal) return;
+        castleMode = !castleMode;
+        castleLevel = 0;
+        const x = castleMode ? castleArrival.x : 0;
+        const z = castleMode ? castleArrival.z : 11.6;
+        const heading = castleMode ? 0 : Math.PI;
+        character.position.set(x, castleMode ? castleFloorY + 0.18 : terrainHeight(x, z), z);
+        character.rotation.set(0, heading, 0);
+        characterModel.rotation.y = Math.PI;
+        forwardVelocity = 0;
+        turnVelocity = 0;
+        movementVelocity.set(0, 0, 0);
+        keys.clear();
+        inspecting = false;
+        inspectMix = 0;
+        isDiving = false;
+        updateWorldChunks(x, z);
+        beachPortal.group.visible = !castleMode;
+        castlePortal.group.visible = castleMode;
+        sea.visible = !castleMode;
+        castleHud.hidden = !castleMode;
+        document.body.classList.toggle("castle-mode", castleMode);
+        if (firstPersonCamera) {
+          const eyeY = character.position.y + (isDiving ? 0.2 : castleMode ? 1.6 : 1.55);
+          camera.position.set(x, eyeY, z);
+          camera.lookAt(
+            x + Math.sin(heading) * 10,
+            eyeY,
+            z + Math.cos(heading) * 10
+          );
+        } else {
+          const cameraDistance = castleMode ? 26 : cameraFollowDistance;
+          const cameraHeight = castleMode ? 24 : cameraFollowHeight;
+          const cameraX = castleMode ? x + cameraDistance : x - Math.sin(heading) * cameraDistance;
+          const cameraZ = castleMode ? z + cameraDistance : z - Math.cos(heading) * cameraDistance;
+          camera.position.set(cameraX, character.position.y + cameraHeight, cameraZ);
+          camera.lookAt(
+            x + (castleMode ? 0 : Math.sin(heading) * 2.4),
+            character.position.y + 0.9,
+            z + (castleMode ? 3 : Math.cos(heading) * 2.4)
+          );
+        }
+      }
+
+      portalButton.addEventListener("click", teleportThroughPortal);
 
       const footprintShape = new THREE.Shape();
       footprintShape.moveTo(0, -0.22);
@@ -1448,16 +2790,257 @@
       let inspectMix = 0;
       let nearbyCollectible = null;
       const inventory = new Map();
+      const sandMaterials = { dry: 0, wet: 0 };
+      const craftedCastles = new Map();
+      const placedCastles = [];
+      let trowelActive = false;
+      let selectedPlacementCastle = null;
+      const castleRecipes = [
+        { id: "drip", name: "Little Drip Castle", size: "Small", scale: 0.72, color: "#b89564", trim: "#e4c487", sand: { wet: 3 }, finds: { Shell: 1 } },
+        { id: "shell-fort", name: "Shell Garden Fort", size: "Small", scale: 0.78, color: "#c5a06e", trim: "#f1dfbd", sand: { dry: 2, wet: 2 }, finds: { Shell: 2 } },
+        { id: "glass-keep", name: "Sea Glass Keep", size: "Medium", scale: 1.05, color: "#b28d5d", trim: "#67bdb6", sand: { wet: 5 }, finds: { "Sea glass": 1 } },
+        { id: "star-spire", name: "Starfish Spire", size: "Medium", scale: 1.12, color: "#c6a575", trim: "#e98f70", sand: { dry: 3, wet: 4 }, finds: { Starfish: 1 } },
+        { id: "tide-palace", name: "Tide Palace", size: "Large", scale: 1.48, color: "#a98455", trim: "#6ca9b3", sand: { wet: 10 }, finds: { Shell: 1, "Sea glass": 1, Starfish: 1 } },
+        { id: "shore-fortress", name: "Grand Shore Fortress", size: "Large", scale: 1.6, color: "#c5a06e", trim: "#d97963", sand: { dry: 6, wet: 8 }, finds: { Shell: 2, "Sea glass": 1, Starfish: 1 } }
+      ];
       const inventoryItems = document.querySelector("#inventory-items");
       const inventoryCount = document.querySelector("#inventory-count");
       const pickupButton = document.querySelector("#pickup");
       const inspectButton = document.querySelector("#inspect");
+      const trowelButton = document.querySelector("#trowel-toggle");
+      const craftButton = document.querySelector("#craft-toggle");
+      const craftingPanel = document.querySelector("#crafting-panel");
+      const craftingStock = document.querySelector("#crafting-stock");
+      const craftingStatus = document.querySelector("#crafting-status");
+      const craftingRecipes = document.querySelector("#crafting-recipes");
+      const craftedInventory = document.querySelector("#crafted-inventory");
+      const craftedEmpty = document.querySelector("#crafted-empty");
+      const placementHint = document.querySelector("#placement-hint");
+      const placementHintText = document.querySelector("#placement-hint-text");
+
+      function updatePlacementHint(message = "") {
+        placementHint.hidden = !selectedPlacementCastle;
+        if (selectedPlacementCastle) {
+          const recipe = castleRecipes.find((entry) => entry.id === selectedPlacementCastle);
+          placementHintText.textContent = message || `Click the beach or water to place ${recipe.name}.`;
+        }
+      }
+
+      function cancelCastlePlacement(message = "Castle placement cancelled.") {
+        selectedPlacementCastle = null;
+        updatePlacementHint();
+        craftingStatus.textContent = message;
+        renderCrafting();
+      }
+
+      function recipeCostText(recipe) {
+        const sandCost = Object.entries(recipe.sand)
+          .map(([type, count]) => `${count} ${type} sand`)
+          .join(" + ");
+        const findCost = Object.entries(recipe.finds)
+          .map(([type, count]) => `${count} ${type}`)
+          .join(" + ");
+        return `${sandCost} + ${findCost}`;
+      }
+
+      function canCraftCastle(recipe) {
+        return Object.entries(recipe.sand).every(([type, count]) => sandMaterials[type] >= count) &&
+          Object.entries(recipe.finds).every(([type, count]) => (inventory.get(type)?.count || 0) >= count);
+      }
+
+      function renderCrafting() {
+        const findStock = ["Shell", "Sea glass", "Starfish"]
+          .map((type) => `${inventory.get(type)?.icon || ""} ${type}: ${inventory.get(type)?.count || 0}`)
+          .join(" · ");
+        craftingStock.textContent = `Dry sand: ${sandMaterials.dry} · Wet sand: ${sandMaterials.wet}\n${findStock}`;
+        craftingRecipes.replaceChildren(...castleRecipes.map((recipe) => {
+          const button = document.createElement("button");
+          button.className = "craft-option";
+          button.type = "button";
+          button.disabled = !canCraftCastle(recipe);
+          const label = document.createElement("span");
+          const name = document.createElement("span");
+          name.className = "craft-option-name";
+          name.textContent = `${recipe.size} · ${recipe.name}`;
+          const cost = document.createElement("span");
+          cost.className = "craft-option-cost";
+          cost.textContent = recipeCostText(recipe);
+          label.append(name, cost);
+          const action = document.createElement("span");
+          action.className = "craft-option-action";
+          action.textContent = "Craft";
+          button.append(label, action);
+          button.addEventListener("click", () => craftCastle(recipe.id));
+          return button;
+        }));
+
+        const ownedEntries = Array.from(craftedCastles, ([id, count]) => ({ recipe: castleRecipes.find((entry) => entry.id === id), count }))
+          .filter((entry) => entry.recipe && entry.count > 0);
+        craftedEmpty.hidden = ownedEntries.length > 0;
+        craftedInventory.replaceChildren(...ownedEntries.map(({ recipe, count }) => {
+          const button = document.createElement("button");
+          button.className = "craft-option";
+          button.type = "button";
+          const label = document.createElement("span");
+          const name = document.createElement("span");
+          name.className = "craft-option-name";
+          name.textContent = `${recipe.size} · ${recipe.name}`;
+          const cost = document.createElement("span");
+          cost.className = "craft-option-cost";
+          cost.textContent = "Select to place on land";
+          label.append(name, cost);
+          const action = document.createElement("span");
+          action.className = "craft-option-action";
+          action.textContent = `×${count}`;
+          button.append(label, action);
+          button.addEventListener("click", () => selectCastleForPlacement(recipe.id));
+          return button;
+        }));
+      }
+
+      function updateTrowelButton() {
+        trowelButton.setAttribute("aria-pressed", String(trowelActive));
+        trowelButton.textContent = trowelActive ? "🪏 Trowel · ON" : "🪏 Trowel";
+        handTrowel.visible = trowelActive;
+      }
+
+      function setTrowelActive(active) {
+        trowelActive = active;
+        if (active && selectedPlacementCastle) {
+          selectedPlacementCastle = null;
+          updatePlacementHint();
+        }
+        updateTrowelButton();
+        renderCrafting();
+      }
+
+      function castleSandColor(recipe) {
+        return new THREE.Color(recipe.color);
+      }
+
+      function createPlayerCastle(recipe) {
+        const group = new THREE.Group();
+        const sandMaterial = new THREE.MeshStandardMaterial({
+          color: castleSandColor(recipe), roughness: 1
+        });
+        const trimMaterial = new THREE.MeshStandardMaterial({
+          color: recipe.trim,
+          roughness: 0.75
+        });
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(0.82, 0.92, 0.28, 12), sandMaterial);
+        base.position.y = 0.14;
+        base.castShadow = true;
+        base.receiveShadow = true;
+        group.add(base);
+
+        const hall = new THREE.Mesh(new THREE.BoxGeometry(0.88, 0.62, 0.72), sandMaterial);
+        hall.position.set(0, 0.56, 0);
+        hall.castShadow = true;
+        group.add(hall);
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(0.58, 0.48, 4), trimMaterial);
+        roof.position.set(0, 1.1, 0);
+        roof.rotation.y = Math.PI / 4;
+        roof.castShadow = true;
+        group.add(roof);
+
+        for (const [x, z] of [[-0.58, -0.5], [0.58, -0.5], [-0.58, 0.5], [0.58, 0.5]]) {
+          const tower = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 0.95, 8), sandMaterial);
+          tower.position.set(x, 0.61, z);
+          tower.castShadow = true;
+          tower.receiveShadow = true;
+          group.add(tower);
+          const turret = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.35, 8), trimMaterial);
+          turret.position.set(x, 1.26, z);
+          turret.castShadow = true;
+          group.add(turret);
+        }
+
+        for (const z of [-0.5, 0.5]) {
+          const wall = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.48, 0.11), sandMaterial);
+          wall.position.set(0, 0.48, z);
+          wall.castShadow = true;
+          group.add(wall);
+        }
+        const flagpole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.5, 6), trimMaterial);
+        flagpole.position.set(0, 1.38, 0);
+        group.add(flagpole);
+        const flag = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.28, 3), trimMaterial);
+        flag.position.set(0.12, 1.48, 0);
+        flag.rotation.z = -Math.PI / 2;
+        group.add(flag);
+        group.scale.setScalar(recipe.scale);
+        group.traverse((part) => {
+          if (part.isMesh) part.castShadow = true;
+        });
+        return group;
+      }
+
+      function addPlacedCastle(recipeId, x, z, rotationY = 0) {
+        const recipe = castleRecipes.find((entry) => entry.id === recipeId);
+        if (!recipe) return null;
+        const group = createPlayerCastle(recipe);
+        const groundY = sea.visible && z < shoreZ(x)
+          ? Math.max(terrainHeight(x, z), sea.position.y)
+          : terrainHeight(x, z);
+        group.position.set(x, groundY, z);
+        group.rotation.y = rotationY;
+        scene.add(group);
+        const placed = { recipeId, x, z, rotationY, group };
+        placedCastles.push(placed);
+        return placed;
+      }
+
+      function selectCastleForPlacement(recipeId) {
+        if ((craftedCastles.get(recipeId) || 0) < 1) return;
+        selectedPlacementCastle = recipeId;
+        setTrowelActive(false);
+        craftingPanel.hidden = true;
+        craftButton.setAttribute("aria-expanded", "false");
+        const recipe = castleRecipes.find((entry) => entry.id === recipeId);
+        craftingStatus.textContent = `${recipe.name} selected.`;
+        updatePlacementHint();
+      }
+
+      function craftCastle(recipeId) {
+        const recipe = castleRecipes.find((entry) => entry.id === recipeId);
+        if (!recipe || !canCraftCastle(recipe)) return;
+        for (const [type, count] of Object.entries(recipe.sand)) sandMaterials[type] -= count;
+        for (const [type, count] of Object.entries(recipe.finds)) {
+          const item = inventory.get(type);
+          item.count -= count;
+          if (item.count === 0) inventory.delete(type);
+        }
+        craftedCastles.set(recipeId, (craftedCastles.get(recipeId) || 0) + 1);
+        renderInventory();
+        renderCrafting();
+        craftingStatus.textContent = `${recipe.name} added to your castle inventory.`;
+      }
+
+      function collectSandAtPointer(pointer) {
+        const raycaster = sandGrainRaycaster;
+        raycaster.setFromCamera(pointer, camera);
+        const waterHit = sea.visible ? raycaster.intersectObject(sea, false)[0] : null;
+        const landHit = raycaster.intersectObject(sand, false)[0];
+        if (waterHit && (!landHit || waterHit.distance < landHit.distance)) {
+          sandMaterials.wet++;
+          craftingStatus.textContent = "Collected 1 scoop of wet sand.";
+        } else {
+          if (!landHit) {
+            craftingStatus.textContent = "Aim at beach sand or water to collect sand with the trowel.";
+            return;
+          }
+          sandMaterials.dry++;
+          craftingStatus.textContent = "Collected 1 scoop of dry sand.";
+        }
+        renderCrafting();
+      }
 
       function renderInventory() {
         const totalFinds = Array.from(inventory.values()).reduce((total, entry) => total + entry.count, 0);
         inventoryCount.textContent = `${totalFinds} ${totalFinds === 1 ? "find" : "finds"}`;
         if (inventory.size === 0) {
           inventoryItems.innerHTML = '<span class="inventory-empty">Nothing collected yet</span>';
+          renderCrafting();
           return;
         }
         inventoryItems.replaceChildren(...Array.from(inventory, ([type, entry]) => {
@@ -1466,15 +3049,15 @@
           chip.textContent = `${entry.icon} ${type} ×${entry.count}`;
           return chip;
         }));
+        renderCrafting();
       }
 
       function collectNearbyItem() {
-        if (!inspecting || !nearbyCollectible) return;
+        if (!gameRunning || !inspecting || !nearbyCollectible) return;
         const item = nearbyCollectible;
         item.collected = true;
         if (item.id) collectedItemIds.add(item.id);
-        item.group.parent.remove(item.group);
-        disposeObjectResources(item.group);
+        item.group.visible = false;
         const current = inventory.get(item.type) || { icon: item.icon, count: 0 };
         current.count++;
         inventory.set(item.type, current);
@@ -1483,17 +3066,60 @@
       }
 
       const directions = {
-        ArrowUp: "up", KeyW: "up",
-        ArrowDown: "down", KeyS: "down",
-        ArrowLeft: "left", KeyA: "left",
-        ArrowRight: "right", KeyD: "right"
+        KeyW: "up", KeyS: "down",
+        KeyA: "left", KeyD: "right"
+      };
+      const cameraDirections = {
+        ArrowUp: "camera-up", ArrowDown: "camera-down",
+        ArrowLeft: "camera-left", ArrowRight: "camera-right"
       };
 
       window.addEventListener("keydown", (event) => {
+        if (event.code === "Escape") {
+          event.preventDefault();
+          if (!craftingPanel.hidden) {
+            craftingPanel.hidden = true;
+            craftButton.setAttribute("aria-expanded", "false");
+            return;
+          }
+          if (selectedPlacementCastle) {
+            cancelCastlePlacement();
+            return;
+          }
+          if (gameRunning) {
+            openMainMenu();
+          } else if (hasStarted) {
+            resumeGame();
+          }
+          return;
+        }
+        if (!gameRunning) return;
+        if (event.code === "KeyC" && !event.repeat) {
+          craftingPanel.hidden = !craftingPanel.hidden;
+          craftButton.setAttribute("aria-expanded", String(!craftingPanel.hidden));
+          if (!craftingPanel.hidden) {
+            keys.clear();
+            renderCrafting();
+          }
+          return;
+        }
+        if (event.code === "KeyT" && !event.repeat) {
+          setTrowelActive(!trowelActive);
+          return;
+        }
+        if (!craftingPanel.hidden) return;
         if (directions[event.code]) {
           event.preventDefault();
           keys.add(directions[event.code]);
         }
+        if (cameraDirections[event.code]) {
+          event.preventDefault();
+          keys.add(cameraDirections[event.code]);
+        }
+        if (event.code === "KeyV" && !event.repeat) toggleCameraMode();
+        if (event.code === "KeyF" && !event.repeat && nearPortal) teleportThroughPortal();
+        const tool = castleToolSpecs.find((entry) => entry.key === event.code);
+        if (tool && !event.repeat) selectCastleTool(tool.id);
         if (event.code === "ShiftLeft" || event.code === "ShiftRight") sprintHeld = true;
         if (event.code === "KeyU" && !event.repeat && canDive) {
           isDiving = !isDiving;
@@ -1505,6 +3131,7 @@
       });
       window.addEventListener("keyup", (event) => {
         if (directions[event.code]) keys.delete(directions[event.code]);
+        if (cameraDirections[event.code]) keys.delete(cameraDirections[event.code]);
         if (event.code === "ShiftLeft" || event.code === "ShiftRight") sprintHeld = false;
       });
       window.addEventListener("blur", () => {
@@ -1529,6 +3156,21 @@
         if (canInspect) inspecting = !inspecting;
       });
       pickupButton.addEventListener("click", collectNearbyItem);
+      trowelButton.addEventListener("click", () => setTrowelActive(!trowelActive));
+      craftButton.addEventListener("click", () => {
+        if (!gameRunning) return;
+        craftingPanel.hidden = !craftingPanel.hidden;
+        craftButton.setAttribute("aria-expanded", String(!craftingPanel.hidden));
+        if (!craftingPanel.hidden) {
+          keys.clear();
+          renderCrafting();
+        }
+      });
+      document.querySelector("#crafting-close").addEventListener("click", () => {
+        craftingPanel.hidden = true;
+        craftButton.setAttribute("aria-expanded", "false");
+      });
+      document.querySelector("#placement-cancel").addEventListener("click", () => cancelCastlePlacement());
 
       const sprintButton = document.querySelector("#sprint");
       const stopSprinting = () => { sprintHeld = false; };
@@ -1554,7 +3196,37 @@
         button.addEventListener("lostpointercapture", release);
       }
 
-      document.querySelector("#reset").addEventListener("click", () => {
+      function resetWorld(clearProgress = false) {
+        selectedPlacementCastle = null;
+        updatePlacementHint();
+        setTrowelActive(false);
+        if (clearProgress) {
+          for (const chunkKey of Array.from(worldChunks.keys())) removeWorldChunk(chunkKey);
+          collectedItemIds.clear();
+          for (const item of collectibles) {
+            item.collected = false;
+            item.group.visible = true;
+          }
+          inventory.clear();
+          sandMaterials.dry = 0;
+          sandMaterials.wet = 0;
+          craftedCastles.clear();
+          placedCastles.forEach(({ group }) => scene.remove(group));
+          placedCastles.length = 0;
+          renderInventory();
+        }
+        craftingPanel.hidden = true;
+        craftButton.setAttribute("aria-expanded", "false");
+        castleMode = false;
+        castleLevel = 0;
+        firstPersonCamera = false;
+        cameraOrbitYaw = 0;
+        cameraOrbitPitch = 0;
+        updateCameraMode();
+        document.body.classList.remove("castle-mode");
+        beachPortal.group.visible = true;
+        castlePortal.group.visible = false;
+        castleHud.hidden = true;
         character.position.set(0, terrainHeight(0, 4), 4);
         character.rotation.set(0, Math.PI, 0);
         isDiving = false;
@@ -1575,7 +3247,330 @@
         });
         footprints.length = 0;
         stepDistance = 0;
+        sandGrains.length = 0;
+        sandGrainMesh.count = 0;
+        for (const brick of castleBricks) brick.alive = true;
+        rebuildCastleMesh();
+        castleDebris.length = 0;
+        castleDebrisMesh.count = 0;
+        castleDebrisMesh.instanceMatrix.needsUpdate = true;
+        if (castleDebrisMesh.instanceColor) castleDebrisMesh.instanceColor.needsUpdate = true;
+        castleBombs.forEach(({ mesh }) => scene.remove(mesh));
+        castleBombs.length = 0;
+        castleImpactEffects.forEach((effect) => {
+          scene.remove(effect);
+          effect.geometry.dispose();
+          effect.material.dispose();
+        });
+        castleImpactEffects.length = 0;
+        nearPortal = false;
+        portalButton.hidden = true;
+        selectCastleTool("bomb");
+        renderCrafting();
+        updateWorldChunks(character.position.x, character.position.z);
+      }
+
+      document.querySelector("#reset").addEventListener("click", () => resetWorld());
+
+      const legacySaveKey = "sunny-shore-save-v1";
+      const saveSlotPrefix = "sunny-shore-save-slot-";
+      const saveSlotCount = 5;
+      const mainMenu = document.querySelector("#main-menu");
+      const menuStatus = document.querySelector("#menu-status");
+      const saveSlotSelect = document.querySelector("#save-slot");
+      const saveSlotDetails = document.querySelector("#save-slot-details");
+      const newGameButton = document.querySelector("#new-game");
+      const loadGameButton = document.querySelector("#load-game");
+      const saveGameButton = document.querySelector("#save-game");
+      const resumeGameButton = document.querySelector("#resume-game");
+
+      function getSaveSlotKey(slot) {
+        return `${saveSlotPrefix}${slot}`;
+      }
+
+      function migrateLegacySave() {
+        try {
+          const legacySave = localStorage.getItem(legacySaveKey);
+          if (legacySave && !localStorage.getItem(getSaveSlotKey(1))) {
+            localStorage.setItem(getSaveSlotKey(1), legacySave);
+          }
+        } catch (error) {
+          menuStatus.textContent = `Could not check existing saves: ${error.message}`;
+        }
+      }
+
+      function refreshLoadButton() {
+        try {
+          const selectedSlot = Number(saveSlotSelect.value) || 1;
+          const selectedKey = getSaveSlotKey(selectedSlot);
+          const options = Array.from({ length: saveSlotCount }, (_, index) => {
+            const slot = index + 1;
+            const hasSave = Boolean(localStorage.getItem(getSaveSlotKey(slot)));
+            return new Option(`Slot ${slot}${hasSave ? " · Saved" : " · Empty"}`, String(slot));
+          });
+          const previousSelection = String(selectedSlot);
+          saveSlotSelect.replaceChildren(...options);
+          saveSlotSelect.value = previousSelection;
+          const serialized = localStorage.getItem(selectedKey);
+          loadGameButton.disabled = !serialized;
+          if (!serialized) {
+            saveSlotDetails.textContent = "This slot is empty.";
+          } else {
+            try {
+              const save = JSON.parse(serialized);
+              const date = save.savedAt ? new Date(save.savedAt) : null;
+              saveSlotDetails.textContent = date && !Number.isNaN(date.getTime())
+                ? `Saved ${date.toLocaleString()}`
+                : "This slot contains a saved game.";
+            } catch {
+              saveSlotDetails.textContent = "This slot contains a damaged save.";
+            }
+          }
+        } catch (error) {
+          loadGameButton.disabled = true;
+          menuStatus.textContent = `Save storage is unavailable: ${error.message}`;
+        }
+      }
+
+      function openMainMenu() {
+        gameRunning = false;
+        keys.clear();
+        sprintHeld = false;
+        if (selectedPlacementCastle) cancelCastlePlacement();
+        craftingPanel.hidden = true;
+        craftButton.setAttribute("aria-expanded", "false");
+        mainMenu.hidden = false;
+        resumeGameButton.hidden = !hasStarted;
+        menuStatus.textContent = "";
+        refreshLoadButton();
+      }
+
+      function resumeGame() {
+        if (!hasStarted) return;
+        mainMenu.hidden = true;
+        gameRunning = true;
+      }
+
+      function createSaveSnapshot() {
+        return {
+          version: 2,
+          savedAt: new Date().toISOString(),
+          position: [character.position.x, character.position.y, character.position.z],
+          rotationY: character.rotation.y,
+          castleMode,
+          castleLevel,
+          firstPersonCamera,
+          cameraOrbitYaw,
+          cameraOrbitPitch,
+          selectedCastleTool,
+          inventory: Array.from(inventory, ([type, entry]) => [type, entry.icon, entry.count]),
+          sandMaterials: { ...sandMaterials },
+          craftedCastles: Array.from(craftedCastles),
+          placedCastles: placedCastles.map(({ recipeId, x, z, rotationY }) => [recipeId, x, z, rotationY]),
+          collectedItemIds: Array.from(collectedItemIds),
+          destroyedBricks: castleBricks.flatMap((brick, index) => brick.alive ? [] : [index]),
+          sandGrains: sandGrains.map((grain) => [grain.x, grain.y, grain.z, grain.vx, grain.vy, grain.vz]),
+          castleDebris: castleDebris.map((pixel) => [
+            pixel.x, pixel.y, pixel.z, pixel.vx, pixel.vy, pixel.vz,
+            pixel.rx, pixel.ry, pixel.rz, pixel.spinX, pixel.spinY, pixel.spinZ,
+            pixel.scaleX, pixel.scaleY, pixel.scaleZ, pixel.color.getHex(), pixel.active ? 1 : 0
+          ])
+        };
+      }
+
+      function isFiniteTuple(value, length) {
+        return Array.isArray(value) && value.length === length && value.every(Number.isFinite);
+      }
+
+      function isValidSave(data) {
+        return Boolean(
+          data && typeof data === "object" &&
+          (data.version === 1 || data.version === 2) &&
+          isFiniteTuple(data.position, 3) &&
+          data.position.every((value) => Math.abs(value) <= 10000) &&
+          Number.isFinite(data.rotationY) &&
+          typeof data.castleMode === "boolean" &&
+          Number.isInteger(data.castleLevel) && data.castleLevel >= 0 && data.castleLevel <= 3 &&
+          typeof data.firstPersonCamera === "boolean" &&
+          Number.isFinite(data.cameraOrbitYaw) &&
+          Number.isFinite(data.cameraOrbitPitch) &&
+          castleToolSpecs.some((tool) => tool.id === data.selectedCastleTool) &&
+          Array.isArray(data.inventory) && data.inventory.length <= 100 &&
+          data.inventory.every((entry) =>
+            Array.isArray(entry) && entry.length === 3 &&
+            typeof entry[0] === "string" && entry[0].length <= 50 &&
+            typeof entry[1] === "string" && entry[1].length <= 12 &&
+            Number.isInteger(entry[2]) && entry[2] >= 0 && entry[2] <= 100000
+          ) &&
+          Array.isArray(data.collectedItemIds) && data.collectedItemIds.length <= 100000 &&
+          data.collectedItemIds.every((id) => typeof id === "string" && id.length <= 100) &&
+          Array.isArray(data.destroyedBricks) &&
+          data.destroyedBricks.every((index) =>
+            Number.isInteger(index) && index >= 0 && index < castleBricks.length
+          ) &&
+          Array.isArray(data.sandGrains) && data.sandGrains.length <= maxSandGrains &&
+          data.sandGrains.every((grain) => isFiniteTuple(grain, 6)) &&
+          Array.isArray(data.castleDebris) && data.castleDebris.length <= maxCastleDebris &&
+          data.castleDebris.every((pixel) =>
+            Array.isArray(pixel) && pixel.length === 17 &&
+            pixel.slice(0, 15).every(Number.isFinite) &&
+            Number.isInteger(pixel[15]) && pixel[15] >= 0 && pixel[15] <= 0xffffff &&
+            (pixel[16] === 0 || pixel[16] === 1)
+          ) &&
+          (data.version === 1 || (
+            data.sandMaterials && typeof data.sandMaterials === "object" &&
+            ["dry", "wet"].every((type) =>
+              Number.isInteger(data.sandMaterials[type]) &&
+              data.sandMaterials[type] >= 0 && data.sandMaterials[type] <= 100000
+            ) &&
+            Array.isArray(data.craftedCastles) && data.craftedCastles.length <= castleRecipes.length &&
+            data.craftedCastles.every((entry) =>
+              Array.isArray(entry) && entry.length === 2 &&
+              castleRecipes.some((recipe) => recipe.id === entry[0]) &&
+              Number.isInteger(entry[1]) && entry[1] >= 0 && entry[1] <= 10000
+            ) &&
+            Array.isArray(data.placedCastles) && data.placedCastles.length <= 1000 &&
+            data.placedCastles.every((entry) =>
+              Array.isArray(entry) && entry.length === 4 &&
+              castleRecipes.some((recipe) => recipe.id === entry[0]) &&
+              entry.slice(1).every(Number.isFinite) &&
+              Math.abs(entry[1]) <= 10000 && Math.abs(entry[2]) <= 10000
+            )
+          ))
+        );
+      }
+
+      function saveGame() {
+        try {
+          const selectedSlot = Number(saveSlotSelect.value);
+          if (!Number.isInteger(selectedSlot) || selectedSlot < 1 || selectedSlot > saveSlotCount) {
+            menuStatus.textContent = "Choose a valid save slot.";
+            return;
+          }
+          localStorage.setItem(getSaveSlotKey(selectedSlot), JSON.stringify(createSaveSnapshot()));
+          menuStatus.textContent = `Game saved to Slot ${selectedSlot}.`;
+          refreshLoadButton();
+        } catch (error) {
+          menuStatus.textContent = `Could not save the game: ${error.message}`;
+        }
+      }
+
+      function loadGame() {
+        try {
+          const selectedSlot = Number(saveSlotSelect.value);
+          if (!Number.isInteger(selectedSlot) || selectedSlot < 1 || selectedSlot > saveSlotCount) {
+            menuStatus.textContent = "Choose a valid save slot.";
+            return;
+          }
+          const serialized = localStorage.getItem(getSaveSlotKey(selectedSlot));
+          if (!serialized) {
+            menuStatus.textContent = `Slot ${selectedSlot} is empty.`;
+            refreshLoadButton();
+            return;
+          }
+          const data = JSON.parse(serialized);
+          if (!isValidSave(data)) {
+            menuStatus.textContent = `Slot ${selectedSlot} is damaged or from an unsupported version.`;
+            return;
+          }
+
+          resetWorld(true);
+          for (const chunkKey of Array.from(worldChunks.keys())) removeWorldChunk(chunkKey);
+          collectedItemIds.clear();
+          data.collectedItemIds.forEach((id) => collectedItemIds.add(id));
+          for (const item of collectibles) {
+            item.collected = collectedItemIds.has(item.id);
+            item.group.visible = !item.collected;
+          }
+          inventory.clear();
+          data.inventory.forEach(([type, icon, count]) => inventory.set(type, { icon, count }));
+          sandMaterials.dry = data.version === 2 ? data.sandMaterials.dry : 0;
+          sandMaterials.wet = data.version === 2 ? data.sandMaterials.wet : 0;
+          craftedCastles.clear();
+          if (data.version === 2) data.craftedCastles.forEach(([id, count]) => craftedCastles.set(id, count));
+          if (data.version === 2) {
+            data.placedCastles.forEach(([id, x, z, rotationY]) => addPlacedCastle(id, x, z, rotationY));
+          }
+          renderInventory();
+          craftingStatus.textContent = "";
+
+          const destroyed = new Set(data.destroyedBricks);
+          castleBricks.forEach((brick, index) => { brick.alive = !destroyed.has(index); });
+          rebuildCastleMesh();
+          castleDebris.length = 0;
+          data.castleDebris.forEach((saved, index) => {
+            const pixel = {
+              x: saved[0], y: saved[1], z: saved[2], vx: saved[3], vy: saved[4], vz: saved[5],
+              rx: saved[6], ry: saved[7], rz: saved[8],
+              spinX: saved[9], spinY: saved[10], spinZ: saved[11],
+              scaleX: saved[12], scaleY: saved[13], scaleZ: saved[14],
+              color: new THREE.Color(saved[15]), active: saved[16] === 1, index
+            };
+            castleDebris.push(pixel);
+            castleDebrisDummy.position.set(pixel.x, pixel.y, pixel.z);
+            castleDebrisDummy.rotation.set(pixel.rx, pixel.ry, pixel.rz);
+            castleDebrisDummy.scale.set(pixel.scaleX, pixel.scaleY, pixel.scaleZ);
+            castleDebrisDummy.updateMatrix();
+            castleDebrisMesh.setMatrixAt(index, castleDebrisDummy.matrix);
+            castleDebrisMesh.setColorAt(index, pixel.color);
+          });
+          castleDebrisMesh.count = castleDebris.length;
+          castleDebrisMesh.instanceMatrix.needsUpdate = true;
+          if (castleDebrisMesh.instanceColor) castleDebrisMesh.instanceColor.needsUpdate = true;
+
+          sandGrains.length = 0;
+          data.sandGrains.forEach(([x, y, z, vx, vy, vz], index) => {
+            sandGrains.push({ x, y, z, vx, vy, vz });
+            sandGrainColor.set("#d8bd83");
+            sandGrainMesh.setColorAt(index, sandGrainColor);
+          });
+          sandGrainMesh.count = sandGrains.length;
+          if (sandGrainMesh.instanceColor) sandGrainMesh.instanceColor.needsUpdate = true;
+          updateSandPhysics(0);
+
+          character.position.set(...data.position);
+          character.rotation.set(0, data.rotationY, 0);
+          castleMode = data.castleMode;
+          castleLevel = data.castleLevel;
+          firstPersonCamera = data.firstPersonCamera;
+          cameraOrbitYaw = data.cameraOrbitYaw;
+          cameraOrbitPitch = data.cameraOrbitPitch;
+          updateCameraMode();
+          selectCastleTool(data.selectedCastleTool);
+          isDiving = false;
+          inspecting = false;
+          nearPortal = false;
+          portalButton.hidden = true;
+          beachPortal.group.visible = !castleMode;
+          castlePortal.group.visible = castleMode;
+          sea.visible = !castleMode;
+          castleHud.hidden = !castleMode;
+          document.body.classList.toggle("castle-mode", castleMode);
+          updateWorldChunks(character.position.x, character.position.z);
+          hasStarted = true;
+          gameRunning = true;
+          mainMenu.hidden = true;
+          resumeGameButton.hidden = false;
+          menuStatus.textContent = "";
+        } catch (error) {
+          menuStatus.textContent = `Could not load the game: ${error.message}`;
+        }
+      }
+
+      newGameButton.addEventListener("click", () => {
+        resetWorld(true);
+        hasStarted = true;
+        resumeGame();
       });
+      loadGameButton.addEventListener("click", loadGame);
+      saveGameButton.addEventListener("click", saveGame);
+      resumeGameButton.addEventListener("click", resumeGame);
+      saveSlotSelect.addEventListener("change", () => {
+        menuStatus.textContent = "";
+        refreshLoadButton();
+      });
+      migrateLegacySave();
+      refreshLoadButton();
 
       const clock = new THREE.Clock();
       const desiredCamera = new THREE.Vector3();
@@ -1589,15 +3584,88 @@
       window.addEventListener("resize", resize);
       resize();
 
+      canvas.addEventListener("pointerdown", (event) => {
+        if (!gameRunning || event.button !== 0 || event.target !== canvas || !event.isPrimary) return;
+        const rect = canvas.getBoundingClientRect();
+        const pointer = new THREE.Vector2(
+          ((event.clientX - rect.left) / rect.width) * 2 - 1,
+          -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+        if (trowelActive) {
+          collectSandAtPointer(pointer);
+          return;
+        }
+        if (selectedPlacementCastle) {
+          sandGrainRaycaster.setFromCamera(pointer, camera);
+          const groundHits = sandGrainRaycaster.intersectObject(sand, false);
+          const waterHits = sea.visible ? sandGrainRaycaster.intersectObject(sea, false) : [];
+          const hit = [groundHits[0], waterHits[0]]
+            .filter(Boolean)
+            .sort((a, b) => a.distance - b.distance)[0];
+          if (!hit) {
+            updatePlacementHint("Click visible beach or water to place the castle.");
+            return;
+          }
+          const { x, z } = hit.point;
+          const recipeId = selectedPlacementCastle;
+          const rotationY = character.rotation.y;
+          const placed = addPlacedCastle(recipeId, x, z, rotationY);
+          if (!placed) {
+            updatePlacementHint("Could not place that castle. Click visible beach or water to retry.");
+            return;
+          }
+          const remaining = (craftedCastles.get(recipeId) || 1) - 1;
+          if (remaining > 0) craftedCastles.set(recipeId, remaining);
+          else craftedCastles.delete(recipeId);
+          selectedPlacementCastle = null;
+          updatePlacementHint();
+          craftingStatus.textContent = `${castleRecipes.find((recipe) => recipe.id === recipeId).name} placed.`;
+          renderCrafting();
+          return;
+        }
+        const activePortal = castleMode ? castlePortal : beachPortal;
+        sandGrainRaycaster.setFromCamera(pointer, camera);
+        if (sandGrainRaycaster.intersectObject(activePortal.group, true).length > 0) {
+          nearPortal = true;
+          teleportThroughPortal();
+          return;
+        }
+        if (castleMode) {
+          castlePointer.copy(pointer);
+          castleRaycaster.setFromCamera(castlePointer, camera);
+          fireCastleTool({
+            origin: castleRaycaster.ray.origin.clone(),
+            direction: castleRaycaster.ray.direction.clone()
+          });
+          return;
+        }
+        sandGrainPointer.copy(pointer);
+        sandGrainRaycaster.setFromCamera(sandGrainPointer, camera);
+        if (!sandGrainRaycaster.ray.intersectPlane(sandGrainPlane, sandGrainHit)) return;
+        if (
+          sandGrainHit.x < sandGrainBounds.minX ||
+          sandGrainHit.x > sandGrainBounds.maxX ||
+          sandGrainHit.z < sandGrainBounds.minZ ||
+          sandGrainHit.z > sandGrainBounds.maxZ
+        ) return;
+        pourSand(sandGrainHit.x, sandGrainHit.z);
+      });
+
       function animate() {
         requestAnimationFrame(animate);
+        if (!gameRunning) {
+          renderer.render(scene, camera);
+          return;
+        }
         const delta = Math.min(clock.getDelta(), 0.04);
         const time = clock.elapsedTime;
         const turnInput = (keys.has("left") ? 1 : 0) - (keys.has("right") ? 1 : 0);
         const forwardInput = (keys.has("up") ? 1 : 0) - (keys.has("down") ? 1 : 0);
         const turning = turnInput !== 0;
         const moving = forwardInput !== 0;
-        const currentWaterDepth = Math.max(0, shoreZ(character.position.x) - character.position.z);
+        const currentWaterDepth = castleMode
+          ? 0
+          : Math.max(0, shoreZ(character.position.x) - character.position.z);
         const currentlySwimming = THREE.MathUtils.smoothstep(currentWaterDepth, 1.8, 3.1) > 0.5;
         const turnRate = currentlySwimming ? 1.55 : 2.65;
         const turnBlend = 1 - Math.exp(-(turning ? 9 : 13) * delta);
@@ -1640,9 +3708,13 @@
         }
         character.position.x += movementVelocity.x * delta;
         character.position.z += movementVelocity.z * delta;
+        if (castleMode) {
+          character.position.x = THREE.MathUtils.clamp(character.position.x, castleCenterX - 37, castleCenterX + 37);
+          character.position.z = THREE.MathUtils.clamp(character.position.z, castleArrival.z - 7, castleCenterZ + 37);
+        }
         updateWorldChunks(character.position.x, character.position.z);
         const waterDepth = Math.max(0, shoreZ(character.position.x) - character.position.z);
-        const swimAmount = THREE.MathUtils.smoothstep(waterDepth, 1.8, 3.1);
+        const swimAmount = castleMode ? 0 : THREE.MathUtils.smoothstep(waterDepth, 1.8, 3.1);
         const swimming = swimAmount > 0.5;
         const seaCenterZ = waterDepth > 0
           ? character.position.z - 49
@@ -1668,9 +3740,20 @@
           diveButton.setAttribute("aria-pressed", String(isDiving));
           diveButton.setAttribute("aria-label", isDiving ? "Surface from underwater" : "Dive underwater");
         }
+        const activePortal = castleMode ? castleArrival : beachPortalPosition;
+        nearPortal = Math.hypot(
+          character.position.x - activePortal.x,
+          character.position.z - activePortal.z
+        ) < 4.8;
+        portalButton.hidden = !nearPortal;
+        portalButton.textContent = castleMode
+          ? "F  ·  Return to the beach"
+          : "F  ·  Enter the sandcastle portal";
         underwaterOverlay.classList.toggle("active", isDiving);
-        sea.visible = !isDiving;
-        const groundHeight = terrainHeight(character.position.x, character.position.z);
+        sea.visible = !isDiving && !castleMode;
+        const groundHeight = castleMode
+          ? castleStairHeight(character.position.x, character.position.z)
+          : terrainHeight(character.position.x, character.position.z);
         const waveHeight =
           Math.sin(character.position.x * 0.24 + time * 1.2) * 0.045 +
           Math.sin(character.position.z * 0.18 - time * 0.85) * 0.035;
@@ -1783,17 +3866,60 @@
           0,
           Math.cos(character.rotation.y)
         );
+        cameraOrbitYaw += (
+          (keys.has("camera-right") ? 1 : 0) - (keys.has("camera-left") ? 1 : 0)
+        ) * 1.8 * delta;
+        cameraOrbitPitch = THREE.MathUtils.clamp(
+          cameraOrbitPitch + (
+            (keys.has("camera-up") ? 1 : 0) - (keys.has("camera-down") ? 1 : 0)
+          ) * 1.35 * delta,
+          -0.55,
+          0.65
+        );
         let cameraTarget = new THREE.Vector3(
           character.position.x + forward.x * 2.4,
           isDiving ? character.position.y + 0.1 : character.position.y + 0.9,
           character.position.z + forward.z * 2.4
         );
-        desiredCamera.set(
-          character.position.x - forward.x * cameraFollowDistance,
-          isDiving ? Math.min(character.position.y + 2.6, surfaceY - 0.3) : character.position.y + cameraFollowHeight,
-          character.position.z - forward.z * cameraFollowDistance
-        );
-        if (inspectMix > 0.001) {
+        if (firstPersonCamera) {
+          const eyeHeight = isDiving ? 0.25 : swimming ? 0.85 : castleMode ? 1.65 : 1.55;
+          const viewYaw = character.rotation.y + cameraOrbitYaw;
+          const viewPitch = cameraOrbitPitch;
+          const viewDirection = new THREE.Vector3(
+            Math.sin(viewYaw) * Math.cos(viewPitch),
+            Math.sin(viewPitch),
+            Math.cos(viewYaw) * Math.cos(viewPitch)
+          );
+          desiredCamera.set(
+            character.position.x,
+            character.position.y + eyeHeight,
+            character.position.z
+          );
+          cameraTarget.copy(desiredCamera).addScaledVector(viewDirection, 10);
+        } else {
+          const horizontalDistance = castleMode ? Math.hypot(26, 26) : cameraFollowDistance;
+          const baseYaw = castleMode ? -Math.PI * 0.75 : character.rotation.y;
+          const basePitch = Math.atan2(
+            castleMode ? 24 : cameraFollowHeight,
+            horizontalDistance
+          );
+          const orbitYaw = baseYaw + cameraOrbitYaw;
+          const orbitPitch = THREE.MathUtils.clamp(basePitch + cameraOrbitPitch, -0.1, 1.1);
+          desiredCamera.set(
+            character.position.x - Math.sin(orbitYaw) * horizontalDistance,
+            character.position.y + Math.tan(orbitPitch) * horizontalDistance,
+            character.position.z - Math.cos(orbitYaw) * horizontalDistance
+          );
+          if (isDiving) {
+            desiredCamera.y = Math.min(character.position.y + 2.6, surfaceY - 0.3);
+          }
+          cameraTarget.set(
+            character.position.x + Math.sin(orbitYaw) * (castleMode ? 3 : 2.4),
+            character.position.y + 0.9,
+            character.position.z + Math.cos(orbitYaw) * (castleMode ? 3 : 2.4)
+          );
+        }
+        if (!firstPersonCamera && inspectMix > 0.001) {
           const groundTarget = new THREE.Vector3(
             character.position.x + forward.x * 2.4,
             0,
@@ -1808,8 +3934,10 @@
           desiredCamera.lerp(closeCamera, inspectMix);
           cameraTarget.lerp(groundTarget, inspectMix);
         }
-        camera.position.lerp(desiredCamera, 1 - Math.exp(-7 * delta));
+        camera.position.lerp(desiredCamera, 1 - Math.exp(-(firstPersonCamera ? 18 : 7) * delta));
         camera.lookAt(cameraTarget);
+        updateSandPhysics(delta);
+        updateCastlePhysics(delta, time);
         renderer.render(scene, camera);
       }
       animate();
